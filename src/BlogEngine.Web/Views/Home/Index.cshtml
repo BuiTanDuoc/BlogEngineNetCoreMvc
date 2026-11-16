@@ -48,6 +48,24 @@
     </section>
 }
 
+@if (Model.Featured.Count > 0)
+{
+    <section class="section">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">@L["Featured"]</span>
+                <h2>@L["Featured posts"]</h2>
+            </div>
+        </div>
+        <div class="cards">
+            @foreach (var p in Model.Featured)
+            {
+                <partial name="_PostCard" model="p" />
+            }
+        </div>
+    </section>
+}
+
 <section class="section">
     <div class="section-head">
         <div>

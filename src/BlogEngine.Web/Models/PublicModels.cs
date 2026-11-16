@@ -22,6 +22,7 @@ public class PostSummary
     public string AuthorUserName { get; set; } = "";
     public string? AuthorDisplayName { get; set; }
     public bool IsCommentEnabled { get; set; }
+    public bool IsFeatured { get; set; }
     public int CommentCount { get; set; }
     public double Rating { get; set; }
     public int Raters { get; set; }
@@ -30,7 +31,7 @@ public class PostSummary
 
     public string AuthorName => string.IsNullOrWhiteSpace(AuthorDisplayName) ? AuthorUserName : AuthorDisplayName!;
     public int ReadingMinutes => Content.ReadingMinutes();
-    /// <summary>Ảnh đầu tiên trong bài (nếu có) — thumbnail cho giao diện Indigo.</summary>
+    /// <summary>Ảnh đầu tiên trong bài (nếu có) — thumbnail cho danh sách bài viết (cả hai giao diện).</summary>
     public string? ImageUrl => Content.FirstImageUrl();
 }
 
@@ -55,6 +56,7 @@ public static class PostQueries
             AuthorUserName = p.Author!.UserName,
             AuthorDisplayName = p.Author!.DisplayName,
             IsCommentEnabled = p.IsCommentEnabled,
+            IsFeatured = p.IsFeatured,
             Rating = p.Rating,
             Raters = p.Raters,
             CommentCount = p.Comments.Count(c => c.IsApproved && !c.IsSpam && !c.IsDeleted),
@@ -167,6 +169,8 @@ public class CategoryCard
 public class HomeViewModel
 {
     public List<CategoryCard> Categories { get; init; } = new();
+    /// <summary>Bài được đánh dấu Featured (tối đa vài bài mới nhất) — hiển thị riêng ở trang chủ.</summary>
+    public List<PostSummary> Featured { get; init; } = new();
     public List<PostSummary> Latest { get; init; } = new();
     public int TotalPosts { get; init; }
 }

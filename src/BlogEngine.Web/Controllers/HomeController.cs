@@ -12,6 +12,7 @@ public class HomeController : LocalizedController
     private const int HomeLatestCount = 6;
     private const int HomeTopicCount = 6;
     private const int HeroCount = 3;
+    private const int FeaturedCount = 3;
 
     private readonly BlogDbContext _db;
     private readonly ISettingsService _settings;
@@ -53,7 +54,12 @@ public class HomeController : LocalizedController
             });
         }
 
-        var latest = await visible.OrderByDescending(p => p.DateCreated).Take(HomeLatestCount).ToSummary().ToListAsync();
+        var featured = await visible.Where(p => p.IsFeatured)
+            .OrderByDescending(p => p.DateCreated).Take(FeaturedCount).ToSummary().ToListAsync();
+        var featuredIds = featured.Select(p => p.Id).ToList();
+        // Bài đã nằm ở mục Featured thì không lặp lại ở mục Latest.
+        var latest = await visible.Where(p => !featuredIds.Contains(p.Id))
+            .OrderByDescending(p => p.DateCreated).Take(HomeLatestCount).ToSummary().ToListAsync();
         var topics = await _db.Categories.AsNoTracking()
             .Select(c => new CategoryCard
             {
@@ -69,6 +75,7 @@ public class HomeController : LocalizedController
 
         return View(new HomeViewModel
         {
+            Featured = featured,
             Latest = latest,
             Categories = topics,
             TotalPosts = await visible.CountAsync()

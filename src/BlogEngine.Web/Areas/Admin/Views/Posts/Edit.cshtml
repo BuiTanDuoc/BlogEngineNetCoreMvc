@@ -40,6 +40,10 @@
             <div class="field"><label class="inline"><input asp-for="IsPublished" /> @L["Published"]</label></div>
             <div class="field"><label class="inline"><input asp-for="IsCommentEnabled" /> @L["Allow comments"]</label></div>
             <div class="field">
+                <label class="inline"><input asp-for="IsFeatured" /> @L["Featured"]</label>
+                <span class="muted small">@L["Featured posts are highlighted on the home page."]</span>
+            </div>
+            <div class="field">
                 <label asp-for="DateCreated"></label>
                 <input type="datetime-local" name="DateCreated" id="DateCreated" value="@(Model.DateCreated?.ToString("yyyy-MM-ddTHH:mm"))" />
                 <span class="muted small">@L["Blog time ({0}). Empty = now. A future date schedules the post.", settings.TimeZoneId]</span>

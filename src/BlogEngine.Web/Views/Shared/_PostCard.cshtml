@@ -38,10 +38,17 @@
 }
 else
 {
-<article class="card hoverable">
-    @if (first is not null)
+<article class="card hoverable@(Model.IsFeatured ? " featured" : "")@(Model.ImageUrl is null ? "" : " has-thumb")">
+    @if (Model.ImageUrl is { } thumb)
     {
-        <span class="label">@first.Name</span>
+        <a class="card-thumb" tabindex="-1" aria-hidden="true" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug"><img src="@thumb" alt="" loading="lazy" /></a>
+    }
+    @if (Model.IsFeatured || first is not null)
+    {
+        <div class="card-labels">
+            @if (Model.IsFeatured) { <span class="label label-featured">★ @L["Featured"]</span> }
+            @if (first is not null) { <span class="label">@first.Name</span> }
+        </div>
     }
     <h3><a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Title</a></h3>
     <p>@summary</p>

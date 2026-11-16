@@ -116,6 +116,14 @@ a.card:hover, .card.hoverable:hover { transform: translateY(-2px); border-color:
 .card p { margin: 0; color: var(--muted); font-size: .95rem; }
 .card .card-meta { margin-top: auto; padding-top: .5rem; display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: .85rem; }
 .card .label { font: 600 .7rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.card-labels { display: flex; flex-wrap: wrap; gap: .35rem .75rem; align-items: center; }
+.card .label-featured { color: var(--warn-text); background: var(--warn-bg); padding: .28rem .5rem; border-radius: 999px; }
+.card.featured { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.card.has-thumb { overflow: hidden; }
+.card-thumb { display: block; margin: -1.25rem -1.3rem .35rem; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
+.card-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.card.hoverable:hover .card-thumb img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .card.hoverable:hover .card-thumb img { transform: none; } }
 .topic { align-items: flex-start; }
 .topic .count { font: 600 .8rem var(--mono); color: var(--muted); }
 

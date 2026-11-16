@@ -47,6 +47,9 @@ public class PostEditModel
     [Display(Name = "Allow comments")]
     public bool IsCommentEnabled { get; set; } = true;
 
+    [Display(Name = "Featured")]
+    public bool IsFeatured { get; set; }
+
     /// <summary>Ngày đăng theo múi giờ của blog. Để trống = bây giờ. Đặt ngày tương lai để hẹn giờ.</summary>
     [Display(Name = "Publish date")]
     public DateTime? DateCreated { get; set; }

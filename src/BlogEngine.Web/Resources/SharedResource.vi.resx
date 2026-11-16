@@ -371,4 +371,6 @@
   <data name="Menu" xml:space="preserve"><value>Menu</value></data>
   <data name="Back to top" xml:space="preserve"><value>Lên đầu trang</value></data>
   <data name="Sidebar" xml:space="preserve"><value>Thanh bên</value></data>
+  <data name="Featured" xml:space="preserve"><value>Nổi bật</value></data>
+  <data name="Featured posts are highlighted on the home page." xml:space="preserve"><value>Bài nổi bật được giới thiệu ở trang chủ.</value></data>
 </root>

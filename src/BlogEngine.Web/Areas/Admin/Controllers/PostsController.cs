@@ -88,6 +88,7 @@ public class PostsController : AdminControllerBase
             Tags = string.Join(", ", post.Tags.Select(t => t.Name)),
             IsPublished = post.IsPublished,
             IsCommentEnabled = post.IsCommentEnabled,
+            IsFeatured = post.IsFeatured,
             DateCreated = post.DateCreated.ToBlogTime(settings)
         });
     }
@@ -217,6 +218,7 @@ public class PostsController : AdminControllerBase
         post.Content = model.Content;
         post.IsPublished = model.IsPublished;
         post.IsCommentEnabled = model.IsCommentEnabled;
+        post.IsFeatured = model.IsFeatured;
         post.DateModified = now;
 
         var baseSlug = SlugHelper.Slugify(model.Slug.NullIfEmpty() ?? post.Title, 200);

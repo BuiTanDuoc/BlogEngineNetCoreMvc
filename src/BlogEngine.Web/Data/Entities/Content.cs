@@ -19,6 +19,9 @@ public class Post
     public bool IsPublished { get; set; }
     public bool IsCommentEnabled { get; set; } = true;
 
+    /// <summary>Bài nổi bật: được ghim ở mục "Featured" trên trang chủ.</summary>
+    public bool IsFeatured { get; set; }
+
     /// <summary>Đã chuyển vào thùng rác (soft delete, giống BlogEngine gốc).</summary>
     public bool IsDeleted { get; set; }
 

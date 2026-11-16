@@ -31,7 +31,7 @@
     {
         var scheduled = p.IsPublished && p.DateCreated > DateTime.UtcNow;
         <tr>
-            <td><a href="/admin/posts/edit/@p.Id"><strong>@p.Title</strong></a></td>
+            <td><a href="/admin/posts/edit/@p.Id"><strong>@p.Title</strong></a>@if (p.IsFeatured) { <span class="status status-featured" title="@L["Featured"]">★ @L["Featured"]</span> }</td>
             <td>@p.Author?.Name</td>
             <td>@string.Join(", ", p.Categories.Select(c => c.Name))</td>
             <td>@p.DateCreated.ToBlogTime(settings).ToString("yyyy-MM-dd HH:mm")</td>
