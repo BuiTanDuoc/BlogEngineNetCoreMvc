@@ -1,0 +1,77 @@
+@model PostEditModel
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? L["New post"].Value : L["Edit post"].Value;
+    var categories = (List<Category>)ViewBag.Categories;
+    var settings = (BlogSettings)ViewBag.Settings;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (ViewBag.IsDeleted == true)
+{
+    <div class="alert alert-warning">@L["This post is in the trash. Restore it from the post list to make it available again."]</div>
+}
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="form-grid">
+    <div>
+        <div asp-validation-summary="All" class="validation-summary"></div>
+
+        <div class="field">
+            <label asp-for="Title"></label>
+            <input asp-for="Title" maxlength="255" required autofocus />
+        </div>
+        <div class="field">
+            <label asp-for="Slug"></label>
+            <input asp-for="Slug" maxlength="200" placeholder="@L["auto from title"]" />
+        </div>
+        <div class="field">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" rows="3"></textarea>
+        </div>
+        <div class="field">
+            <label for="editor">@L["Content (HTML)"]</label>
+            <partial name="_RichEditor" model="Model.Content" />
+        </div>
+    </div>
+
+    <div>
+        <div class="panel">
+            <h2>@L["Publish"]</h2>
+            <div class="field"><label class="inline"><input asp-for="IsPublished" /> @L["Published"]</label></div>
+            <div class="field"><label class="inline"><input asp-for="IsCommentEnabled" /> @L["Allow comments"]</label></div>
+            <div class="field">
+                <label asp-for="DateCreated"></label>
+                <input type="datetime-local" name="DateCreated" id="DateCreated" value="@(Model.DateCreated?.ToString("yyyy-MM-ddTHH:mm"))" />
+                <span class="muted small">@L["Blog time ({0}). Empty = now. A future date schedules the post.", settings.TimeZoneId]</span>
+            </div>
+            <button type="submit" class="btn">@(isNew ? L["Create"] : L["Save"])</button>
+            @if (!isNew && ViewBag.IsDeleted != true)
+            {
+                <a class="btn btn-secondary" asp-area="" asp-controller="Posts" asp-action="Details" asp-route-slug="@(ViewBag.Slug as string)" target="_blank">@L["View"]</a>
+            }
+        </div>
+
+        <div class="panel">
+            <h2>@L["Categories"]</h2>
+            <div class="checklist">
+                @foreach (var c in categories)
+                {
+                    <label><input type="checkbox" name="CategoryIds" value="@c.Id" checked="@Model.CategoryIds.Contains(c.Id)" /> @c.Name</label>
+                }
+                @if (categories.Count == 0) { <span class="muted">@L["No categories yet."]</span> }
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>@L["Tags"]</h2>
+            <input asp-for="Tags" placeholder="@L["news, tutorial"]" />
+        </div>
+    </div>
+</form>
+
+@if (!isNew && ViewBag.IsDeleted != true)
+{
+    <form asp-action="Trash" asp-route-id="@Model.Id" method="post" data-confirm="@L["Move this post to trash?"]">
+        <button class="btn btn-secondary">@L["Move to trash"]</button>
+    </form>
+}

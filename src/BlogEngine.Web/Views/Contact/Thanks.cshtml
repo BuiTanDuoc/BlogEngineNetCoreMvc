@@ -1,0 +1,5 @@
+@{
+    ViewData["Title"] = L["Thank you"].Value;
+    var settings = (BlogSettings)ViewBag.Settings;
+}
+@Html.Raw(settings.ContactThankMessage)

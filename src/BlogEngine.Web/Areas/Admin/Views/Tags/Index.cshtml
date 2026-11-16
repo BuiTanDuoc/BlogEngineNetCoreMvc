@@ -1,0 +1,30 @@
+@model List<(int Id, string Name, string Slug, int Count)>
+@{ ViewData["Title"] = L["Tags"].Value; }
+<h1>@L["Tags"]</h1>
+<p class="muted">@L["Tags are created automatically when you type them in a post."]</p>
+<div class="table-wrap">
+<table class="grid">
+    <thead><tr><th>@L["Name"]</th><th>@L["Slug"]</th><th>@L["Posts"]</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var t in Model)
+    {
+        <tr>
+            <td>
+                <form asp-action="Rename" asp-route-id="@t.Id" method="post" class="row-actions">
+                    <input type="text" name="name" value="@t.Name" maxlength="50" style="max-width:16rem" aria-label="@L["Tag name"]" />
+                    <button class="btn btn-small btn-secondary">@L["Rename"]</button>
+                </form>
+            </td>
+            <td>@t.Slug</td>
+            <td>@t.Count</td>
+            <td>
+                <form asp-action="Delete" asp-route-id="@t.Id" method="post" data-confirm="@L["Delete this tag from all posts?"]">
+                    <button class="btn btn-small btn-danger">@L["Delete"]</button>
+                </form>
+            </td>
+        </tr>
+    }
+    @if (Model.Count == 0) { <tr><td colspan="4" class="muted">@L["No tags."]</td></tr> }
+    </tbody>
+</table>
+</div>

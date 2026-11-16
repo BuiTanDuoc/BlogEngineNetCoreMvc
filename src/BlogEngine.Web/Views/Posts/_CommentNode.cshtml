@@ -1,0 +1,28 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model CommentNode
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+    var c = Model.Comment;
+    var website = c.Website.ToSafeHttpUrl();
+    var depth = ViewData["Depth"] is int d ? d : 0;
+}
+<div class="comment" id="id_@c.Id" style="margin-left:@(Math.Min(depth, 4) * 1.5)rem">
+    @if (settings.EnableGravatar && !string.IsNullOrWhiteSpace(c.Email))
+    {
+        <img class="avatar" src="@c.Email.GravatarUrl(40)" alt="" width="40" height="40" loading="lazy" referrerpolicy="no-referrer" />
+    }
+    <div class="comment-main">
+        <div class="comment-meta">
+            @if (website is not null) { <a href="@website" rel="nofollow ugc noopener" target="_blank"><strong>@c.Author</strong></a> }
+            else { <strong>@c.Author</strong> }
+            <span class="muted">· @c.Date.ToBlogTime(settings).ToString(L["MMM d, yyyy HH:mm"].Value)</span>
+        </div>
+        <div class="comment-body">@Html.Raw(c.Content.ToSafeCommentHtml())</div>
+        <a href="#respond" class="reply-link small" data-comment-id="@c.Id" data-author="@c.Author">@L["Reply"]</a>
+    </div>
+</div>
+@foreach (var reply in Model.Replies)
+{
+    @await Html.PartialAsync("_CommentNode", reply, new ViewDataDictionary(ViewData) { { "Depth", depth + 1 } })
+}

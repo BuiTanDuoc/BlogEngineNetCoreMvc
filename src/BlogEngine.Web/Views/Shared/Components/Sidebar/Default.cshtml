@@ -1,0 +1,94 @@
+@model SidebarViewModel
+
+<section class="widget">
+    <h3>Recent posts</h3>
+    @if (Model.RecentPosts.Count == 0) { <p class="muted">No posts yet.</p> }
+    else
+    {
+        <ul>
+            @foreach (var p in Model.RecentPosts)
+            {
+                <li><a asp-controller="Posts" asp-action="Details" asp-route-slug="@p.Slug">@p.Title</a></li>
+            }
+        </ul>
+    }
+</section>
+
+@if (Model.Categories.Count > 0)
+{
+    <section class="widget">
+        <h3>Categories</h3>
+        <ul>
+            @foreach (var c in Model.Categories)
+            {
+                <li><a asp-controller="Categories" asp-action="Details" asp-route-slug="@c.Slug">@c.Name</a> <span class="muted">(@Model.CategoryCounts[c.Id])</span></li>
+            }
+        </ul>
+    </section>
+}
+
+@if (Model.Tags.Count > 0)
+{
+    <section class="widget">
+        <h3>Tags</h3>
+        <div class="tag-cloud">
+            @foreach (var t in Model.Tags)
+            {
+                var weight = t.Count >= 10 ? 3 : t.Count >= 4 ? 2 : 1;
+                <a class="tag tag-w@(weight)" asp-controller="Tags" asp-action="Details" asp-route-slug="@t.Slug" title="@t.Count post(s)">@t.Name</a>
+            }
+        </div>
+    </section>
+}
+
+@if (Model.RecentComments.Count > 0)
+{
+    <section class="widget">
+        <h3>Recent comments</h3>
+        <ul>
+            @foreach (var c in Model.RecentComments)
+            {
+                <li>
+                    <a href="@Url.Action("Details", "Posts", new { slug = c.PostSlug })#id_@c.CommentId"><strong>@c.Author</strong> on @c.PostTitle</a>
+                    <div class="muted small">@c.Excerpt</div>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@if (Model.Months.Count > 0)
+{
+    <section class="widget">
+        <h3>Archive</h3>
+        <ul>
+            @foreach (var m in Model.Months)
+            {
+                <li><a href="/@m.Year/@m.Month.ToString("00")">@(new DateTime(m.Year, m.Month, 1).ToString("MMMM yyyy"))</a> <span class="muted">(@m.Count)</span></li>
+            }
+        </ul>
+    </section>
+}
+
+@if (Model.BlogRoll.Count > 0)
+{
+    <section class="widget">
+        <h3>Blogroll</h3>
+        <ul>
+            @foreach (var b in Model.BlogRoll)
+            {
+                var url = b.BlogUrl.ToSafeHttpUrl();
+                if (url is null) { continue; }
+                <li><a href="@url" rel="@(string.IsNullOrWhiteSpace(b.Xfn) ? "noopener" : b.Xfn + " noopener")" target="_blank" title="@b.Description">@b.Title</a></li>
+            }
+        </ul>
+    </section>
+}
+
+<section class="widget">
+    <h3>Subscribe</h3>
+    <ul>
+        <li><a href="/feed">RSS feed</a></li>
+        <li><a href="/feed/atom">Atom feed</a></li>
+    </ul>
+</section>

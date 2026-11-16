@@ -1,0 +1,66 @@
+@model CommentListViewModel
+@inject ISettingsService SettingsService
+@{
+    ViewData["Title"] = L["Comments"].Value;
+    var settings = await SettingsService.GetAsync();
+    string Tab(string f) => Model.Filter == f ? "active" : "";
+}
+<h1>@L["Comments"]</h1>
+<div class="toolbar">
+    <div class="tabs">
+        <a class="@Tab("pending")" href="?filter=pending">@L["Pending ({0})", Model.PendingCount]</a>
+        <a class="@Tab("approved")" href="?filter=approved">@L["Approved ({0})", Model.ApprovedCount]</a>
+        <a class="@Tab("spam")" href="?filter=spam">@L["Spam ({0})", Model.SpamCount]</a>
+        <a class="@Tab("trash")" href="?filter=trash">@L["Trash ({0})", Model.TrashCount]</a>
+    </div>
+</div>
+
+@foreach (var c in Model.Comments.Items)
+{
+    <div class="panel">
+        <div class="toolbar" style="margin-bottom:.5rem">
+            <div>
+                <strong>@c.Author</strong>
+                @if (!string.IsNullOrWhiteSpace(c.Email)) { <span class="muted"> &lt;@c.Email&gt;</span> }
+                @if (!string.IsNullOrWhiteSpace(c.Ip)) { <span class="muted small"> · @c.Ip</span> }
+                <div class="muted small">
+                    @c.Date.ToBlogTime(settings).ToString("yyyy-MM-dd HH:mm") on
+                    @if (Model.Posts.TryGetValue(c.PostId, out var post))
+                    {
+                        <a asp-area="" asp-controller="Posts" asp-action="Details" asp-route-slug="@post.Slug" asp-fragment="id_@c.Id" target="_blank">@post.Title</a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="comment-text">@c.Content</div>
+        <div class="row-actions" style="margin-top:.75rem">
+            @if (c.IsDeleted)
+            {
+                <form asp-action="Restore" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small btn-secondary">@L["Restore"]</button></form>
+            }
+            else
+            {
+                @if (c.IsSpam)
+                {
+                    <form asp-action="NotSpam" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small">@L["Not spam"]</button></form>
+                }
+                else
+                {
+                    @if (!c.IsApproved)
+                    {
+                        <form asp-action="Approve" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small">@L["Approve"]</button></form>
+                    }
+                    else
+                    {
+                        <form asp-action="Unapprove" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small btn-secondary">@L["Unapprove"]</button></form>
+                    }
+                    <form asp-action="Spam" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small btn-secondary">@L["Spam"]</button></form>
+                }
+                <form asp-action="Trash" asp-route-id="@c.Id" asp-route-filter="@Model.Filter" method="post"><button class="btn btn-small btn-danger">@L["Delete"]</button></form>
+            }
+        </div>
+    </div>
+}
+@if (!Model.Comments.Items.Any()) { <p class="muted">@L["Nothing here."]</p> }
+
+<partial name="~/Views/Shared/_Pager.cshtml" model="Model.Comments" />

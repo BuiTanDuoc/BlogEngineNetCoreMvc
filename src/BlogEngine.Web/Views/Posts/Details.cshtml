@@ -1,0 +1,173 @@
+@model PostDetailsViewModel
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+    var post = Model.Post;
+    ViewData["Title"] = post.Title;
+    ViewData["Description"] = string.IsNullOrWhiteSpace(post.Description) ? post.Content.Excerpt(160) : post.Description;
+    var published = post.IsPublished && post.DateCreated <= DateTime.UtcNow;
+    var rated = Context.Request.Cookies.ContainsKey($"rated-{post.Id}");
+}
+
+<div class="narrow">
+<article class="post-full">
+    @if (!published)
+    {
+        <div class="alert alert-warning">@L["This post is not public yet — only you can see this preview."]</div>
+    }
+
+    @if (post.Categories.Count > 0)
+    {
+        <span class="eyebrow">
+            @for (var i = 0; i < post.Categories.Count; i++)
+            {
+                <a asp-controller="Categories" asp-action="Details" asp-route-slug="@post.Categories[i].Slug">@post.Categories[i].Name</a>@(i < post.Categories.Count - 1 ? " · " : "")
+            }
+        </span>
+    }
+    <h1 class="post-title">@post.Title</h1>
+    <div class="post-meta">
+        <time datetime="@post.DateCreated.ToString("o")">@post.DateCreated.ToBlogTime(settings).ToString(L["MMMM d, yyyy"].Value)</time>
+        <span class="sep">·</span>
+        <span>@L["{0} min read", post.Content.ReadingMinutes()]</span>
+        @if (post.Author is not null)
+        {
+            <span class="sep">·</span>
+            <a asp-controller="Author" asp-action="Details" asp-route-username="@post.Author.UserName">@post.Author.Name</a>
+        }
+        @if (User.IsStaff())
+        {
+            <span class="sep">·</span>
+            <a href="/admin/posts/edit/@post.Id">@L["Edit"]</a>
+        }
+    </div>
+
+    <div class="post-body">@Html.Raw(post.Content)</div>
+
+    @if (post.Tags.Count > 0)
+    {
+        <div class="tags">
+            @foreach (var t in post.Tags)
+            {
+                <a class="tag" asp-controller="Tags" asp-action="Details" asp-route-slug="@t.Slug">#@t.Name</a>
+            }
+        </div>
+    }
+
+    @if (settings.EnableRating && published)
+    {
+        <div class="rating">
+            <span>
+                @if (post.Raters > 0) { <text>@L.Plural(post.Raters, "Rating: {1} / 5 ({0} vote)", "Rating: {1} / 5 ({0} votes)", post.Rating.ToString("0.0"))</text> }
+                else { <text>@L["No ratings yet"]</text> }
+            </span>
+            @if (!rated)
+            {
+                <form asp-controller="Posts" asp-action="Rate" asp-route-slug="@post.Slug" method="post" class="inline-form">
+                    <label class="visually-hidden" for="rating">@L["Your rating"]</label>
+                    <select name="rating" id="rating" style="width:auto">
+                        @for (var i = 5; i >= 1; i--) { <option value="@i">@i ★</option> }
+                    </select>
+                    <button type="submit" class="btn btn-small">@L["Rate"]</button>
+                </form>
+            }
+            else { <span class="muted">@L["Thanks for rating!"]</span> }
+        </div>
+    }
+</article>
+
+<nav class="post-nav" aria-label="@L["Post navigation"]">
+    <div>
+        @if (Model.Previous is not null) { <a rel="prev" asp-action="Details" asp-route-slug="@Model.Previous.Slug"><small>← @L["Older"]</small>@Model.Previous.Title</a> }
+    </div>
+    <div class="right">
+        @if (Model.Next is not null) { <a rel="next" asp-action="Details" asp-route-slug="@Model.Next.Slug"><small>@L["Newer"] →</small>@Model.Next.Title</a> }
+    </div>
+</nav>
+
+@if (Model.Related.Count > 0)
+{
+    <section class="related">
+        <h3>@L["Related posts"]</h3>
+        <ul>
+            @foreach (var r in Model.Related)
+            {
+                <li><a asp-action="Details" asp-route-slug="@r.Slug">@r.Title</a></li>
+            }
+        </ul>
+    </section>
+}
+
+@if (settings.IsCommentsEnabled && (post.IsCommentEnabled || Model.CommentCount > 0))
+{
+    <section id="comments" class="comments">
+        <h3>@L.Plural(Model.CommentCount, "{0} comment", "{0} comments")</h3>
+
+        @if (TempData["CommentMessage"] is string commentMessage)
+        {
+            <div class="alert alert-success" role="status">@commentMessage</div>
+        }
+
+        @foreach (var node in Model.Comments)
+        {
+            <partial name="_CommentNode" model="node" />
+        }
+
+        @if (Model.CanComment)
+        {
+            <h3 id="respond">@L["Leave a comment"]</h3>
+            <form asp-controller="Posts" asp-action="Comment" asp-route-slug="@post.Slug" method="post" class="form" id="comment-form">
+                <input type="hidden" name="ParentId" id="ParentId" value="@Model.Input.ParentId" />
+
+                <div class="reply-banner" id="reply-banner" hidden>
+                    @L["Replying to"] <strong id="reply-to-name"></strong> — <a href="#respond" id="cancel-reply">@L["Cancel"].Value.ToLower()</a>
+                </div>
+
+                <div class="field">
+                    <label for="Name">@L["Name"]</label>
+                    <input type="text" name="Name" id="Name" value="@Model.Input.Name" maxlength="100" required autocomplete="name" />
+                </div>
+                <div class="field">
+                    <label for="Email">@L["Email"] <span class="muted">(@L["not published"])</span></label>
+                    <input type="email" name="Email" id="Email" value="@Model.Input.Email" maxlength="255" required autocomplete="email" />
+                </div>
+                <div class="field">
+                    <label for="Website">@L["Website"]</label>
+                    <input type="text" name="Website" id="Website" value="@Model.Input.Website" maxlength="255" autocomplete="url" />
+                </div>
+                <div class="field">
+                    <label for="Content">@L["Comment"]</label>
+                    <textarea name="Content" id="Content" rows="6" maxlength="4000" required>@Model.Input.Content</textarea>
+                    <span class="muted small">@L["Plain text only; HTML is not allowed."]</span>
+                </div>
+
+                @* Honeypot: ẩn bằng CSS, người dùng thật không điền. *@
+                <div class="hp" aria-hidden="true">
+                    <label for="Website2">@L["Leave this field empty"]</label>
+                    <input type="text" name="Website2" id="Website2" tabindex="-1" autocomplete="off" />
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <ul class="validation-summary">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                }
+
+                <button type="submit" class="btn">@L["Post comment"]</button>
+                @if (settings.EnableCommentsModeration && !User.IsStaff())
+                {
+                    <span class="muted small">@L["Comments are moderated and appear after approval."]</span>
+                }
+            </form>
+        }
+        else
+        {
+            <p class="muted">@L["Comments are closed."]</p>
+        }
+    </section>
+}
+</div>

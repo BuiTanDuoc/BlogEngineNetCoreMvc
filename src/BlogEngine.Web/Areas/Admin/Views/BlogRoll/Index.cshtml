@@ -1,0 +1,21 @@
+@model List<BlogRollItem>
+@{ ViewData["Title"] = L["Blogroll"].Value; }
+<h1>@L["Blogroll"]</h1>
+<div class="toolbar"><span></span><a class="btn" href="/admin/blogroll/create">@L["Add link"]</a></div>
+<div class="table-wrap">
+<table class="grid">
+    <thead><tr><th>@L["Title"]</th><th>@L["URL"]</th><th>@L["Order"]</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var b in Model)
+    {
+        <tr>
+            <td><a href="/admin/blogroll/edit/@b.Id"><strong>@b.Title</strong></a><div class="muted small">@b.Description</div></td>
+            <td>@b.BlogUrl</td>
+            <td>@b.SortIndex</td>
+            <td><form asp-action="Delete" asp-route-id="@b.Id" method="post" data-confirm="@L["Delete this link?"]"><button class="btn btn-small btn-danger">@L["Delete"]</button></form></td>
+        </tr>
+    }
+    @if (Model.Count == 0) { <tr><td colspan="4" class="muted">@L["No links."]</td></tr> }
+    </tbody>
+</table>
+</div>

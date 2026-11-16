@@ -1,0 +1,17 @@
+@model string
+<div class="editor-toolbar" role="toolbar" aria-label="@L["Formatting"]">
+    <button type="button" data-editor-action="bold" title="@L["Bold"]"><strong>B</strong></button>
+    <button type="button" data-editor-action="italic" title="@L["Italic"]"><em>I</em></button>
+    <button type="button" data-editor-action="h2">H2</button>
+    <button type="button" data-editor-action="h3">H3</button>
+    <button type="button" data-editor-action="link">@L["Link"]</button>
+    <button type="button" data-editor-action="image">@L["Image"]</button>
+    <button type="button" data-editor-action="ul">@L["List"]</button>
+    <button type="button" data-editor-action="quote">@L["Quote"]</button>
+    <button type="button" data-editor-action="code">@L["Code"]</button>
+    <button type="button" data-editor-action="hr">―</button>
+    <button type="button" data-editor-action="preview">@L["Preview"]</button>
+</div>
+<textarea id="editor" name="Content" rows="18" spellcheck="true">@Model</textarea>
+<iframe id="preview" sandbox hidden title="@L["Preview"]"></iframe>
+<input type="file" id="image-file" accept="image/png,image/jpeg,image/gif,image/webp" hidden />

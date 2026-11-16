@@ -1,0 +1,27 @@
+@model PostListViewModel
+@{
+    if (!string.IsNullOrWhiteSpace(Model.Heading)) { ViewData["Title"] = Model.Heading; }
+}
+@if (!string.IsNullOrWhiteSpace(Model.Heading))
+{
+    <header class="page-heading">
+        <h1>@Model.Heading</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.SubHeading)) { <p class="muted">@Model.SubHeading</p> }
+    </header>
+}
+
+@if (!Model.Posts.Items.Any())
+{
+    <p class="muted">@Model.EmptyMessage</p>
+}
+else
+{
+    <div class="cards">
+        @foreach (var p in Model.Posts.Items)
+        {
+            <partial name="_PostCard" model="p" />
+        }
+    </div>
+}
+
+<partial name="_Pager" model="Model.Posts" />

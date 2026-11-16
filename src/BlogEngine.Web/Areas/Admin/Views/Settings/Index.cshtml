@@ -1,0 +1,70 @@
+@model BlogSettings
+@{ ViewData["Title"] = L["Settings"].Value; }
+<h1>@L["Settings"]</h1>
+<form asp-action="Index" method="post" class="form form-wide">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+
+    <div class="panel">
+        <h2>@L["General"]</h2>
+        <div class="field"><label asp-for="Name"></label><input asp-for="Name" maxlength="100" required /></div>
+        <div class="field"><label asp-for="Description"></label><input asp-for="Description" maxlength="500" /></div>
+        <div class="field"><label asp-for="Email"></label><input asp-for="Email" type="email" /></div>
+        <div class="field">
+            <label for="Culture">@L["Default language"]</label>
+            <select name="Culture" id="Culture">
+                @foreach (var code in SupportedLanguages.Codes)
+                {
+                    <option value="@code" selected="@Model.Culture.StartsWith(code, StringComparison.OrdinalIgnoreCase)">@SupportedLanguages.DisplayName(code)</option>
+                }
+            </select>
+            <span class="muted small">@L["Visitors can switch the language themselves; this is the default for new visitors."]</span>
+        </div>
+        <div class="field"><label asp-for="TimeZoneId"></label><input asp-for="TimeZoneId" /><span class="muted small">@L["Examples: UTC, Asia/Ho_Chi_Minh, Europe/Berlin (Windows ids such as SE Asia Standard Time also work on Windows)."]</span></div>
+    </div>
+
+    <div class="panel">
+        <h2>@L["Appearance"]</h2>
+        <div class="field">
+            <label for="Theme">@L["Theme"]</label>
+            <select name="Theme" id="Theme">
+                @foreach (var t in SiteThemes.All)
+                {
+                    <option value="@t.Key" selected="@string.Equals(Model.Theme, t.Key, StringComparison.OrdinalIgnoreCase)">@t.Name</option>
+                }
+            </select>
+            <span class="muted small">@L["Applies to the public site. Indigo has a gradient header, featured posts, a sidebar and a dark footer."]</span>
+        </div>
+        <div class="field"><label asp-for="SocialFacebook"></label><input asp-for="SocialFacebook" type="url" placeholder="https://facebook.com/..." /></div>
+        <div class="field"><label asp-for="SocialTwitter"></label><input asp-for="SocialTwitter" type="url" placeholder="https://x.com/..." /></div>
+        <div class="field"><label asp-for="SocialLinkedIn"></label><input asp-for="SocialLinkedIn" type="url" placeholder="https://linkedin.com/in/..." /><span class="muted small">@L["Social links appear in the Indigo footer when filled in."]</span></div>
+    </div>
+
+    <div class="panel">
+        <h2>@L["Display"]</h2>
+        <div class="field"><label asp-for="PostsPerPage"></label><input asp-for="PostsPerPage" type="number" min="1" max="100" /></div>
+        <div class="field"><label asp-for="PostsPerFeed"></label><input asp-for="PostsPerFeed" type="number" min="1" max="100" /></div>
+        <div class="field"><label asp-for="NumberOfRecentPosts"></label><input asp-for="NumberOfRecentPosts" type="number" min="1" max="50" /></div>
+        <div class="field"><label asp-for="NumberOfRecentComments"></label><input asp-for="NumberOfRecentComments" type="number" min="1" max="50" /></div>
+        <div class="field"><label class="inline"><input asp-for="EnableRelatedPosts" /> @L["Show related posts"]</label></div>
+        <div class="field"><label class="inline"><input asp-for="EnableRating" /> @L["Enable post ratings"]</label></div>
+    </div>
+
+    <div class="panel">
+        <h2>@L["Comments"]</h2>
+        <div class="field"><label class="inline"><input asp-for="IsCommentsEnabled" /> @L["Enable comments"]</label></div>
+        <div class="field"><label class="inline"><input asp-for="EnableCommentsModeration" /> @L["Moderate comments before publishing"]</label></div>
+        <div class="field"><label class="inline"><input asp-for="EnableGravatar" /> @L["Show Gravatar avatars (loads images from gravatar.com)"]</label></div>
+        <div class="field"><label asp-for="DaysCommentsAreEnabled"></label><input asp-for="DaysCommentsAreEnabled" type="number" min="0" max="3650" /></div>
+        <div class="field"><label class="inline"><input asp-for="SendMailOnComment" /> @L["Email me on new comments (needs the Smtp section in appsettings)"]</label></div>
+        <div class="field"><label asp-for="EmailSubjectPrefix"></label><input asp-for="EmailSubjectPrefix" maxlength="50" /></div>
+    </div>
+
+    <div class="panel">
+        <h2>@L["Contact page & scripts"]</h2>
+        <div class="field"><label asp-for="ContactFormMessage"></label><textarea asp-for="ContactFormMessage" rows="3"></textarea></div>
+        <div class="field"><label asp-for="ContactThankMessage"></label><textarea asp-for="ContactThankMessage" rows="3"></textarea></div>
+        <div class="field"><label asp-for="TrackingScript"></label><textarea asp-for="TrackingScript" rows="4" spellcheck="false"></textarea><span class="muted small">@L["Raw HTML/JS (e.g. analytics). Only administrators can edit this."]</span></div>
+    </div>
+
+    <button type="submit" class="btn">@L["Save settings"]</button>
+</form>

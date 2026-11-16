@@ -1,0 +1,28 @@
+@model Page
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["Description"] = string.IsNullOrWhiteSpace(Model.Description) ? Model.Content.Excerpt(160) : Model.Description;
+    var children = ViewBag.Children as List<Page>;
+}
+<div class="narrow"><article class="post-full">
+    @if (!Model.IsPublished)
+    {
+        <div class="alert alert-warning">@L["This page is not published yet — only you can see this preview."]</div>
+    }
+    <h1 class="post-title">@Model.Title</h1>
+    <div class="post-body">@Html.Raw(Model.Content)</div>
+
+    @if (children is { Count: > 0 })
+    {
+        <ul class="child-pages">
+            @foreach (var c in children)
+            {
+                <li><a asp-controller="Pages" asp-action="Details" asp-route-slug="@c.Slug">@c.Title</a></li>
+            }
+        </ul>
+    }
+    @if (User.IsStaff())
+    {
+        <p class="small"><a href="/admin/pages/edit/@Model.Id">@L["Edit this page"]</a></p>
+    }
+</article></div>

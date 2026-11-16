@@ -1,0 +1,37 @@
+@model PageEditModel
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? L["New page"].Value : L["Edit page"].Value;
+    var parents = (List<Page>)ViewBag.Parents;
+}
+<h1>@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="form-grid">
+    <div>
+        <div asp-validation-summary="All" class="validation-summary"></div>
+        <div class="field"><label asp-for="Title"></label><input asp-for="Title" maxlength="255" required autofocus /></div>
+        <div class="field"><label asp-for="Slug"></label><input asp-for="Slug" maxlength="200" placeholder="@L["auto from title"]" /></div>
+        <div class="field"><label asp-for="Description"></label><textarea asp-for="Description" rows="2"></textarea></div>
+        <div class="field"><label asp-for="Keywords"></label><input asp-for="Keywords" maxlength="500" /></div>
+        <div class="field"><label for="editor">@L["Content (HTML)"]</label><partial name="_RichEditor" model="Model.Content" /></div>
+    </div>
+    <div>
+        <div class="panel">
+            <h2>@L["Publish"]</h2>
+            <div class="field"><label class="inline"><input asp-for="IsPublished" /> @L["Published"]</label></div>
+            <div class="field"><label class="inline"><input asp-for="ShowInList" /> @L["Show in menu"]</label></div>
+            <div class="field"><label class="inline"><input asp-for="IsFrontPage" /> @L["Use as front page"]</label></div>
+            <div class="field">
+                <label asp-for="ParentId"></label>
+                <select asp-for="ParentId">
+                    <option value="">@L["— none —"]</option>
+                    @foreach (var p in parents) { <option value="@p.Id" selected="@(Model.ParentId == p.Id)">@p.Title</option> }
+                </select>
+            </div>
+            <button type="submit" class="btn">@(isNew ? L["Create"] : L["Save"])</button>
+            @if (!isNew && ViewBag.IsDeleted != true)
+            {
+                <a class="btn btn-secondary" asp-area="" asp-controller="Pages" asp-action="Details" asp-route-slug="@(ViewBag.Slug as string)" target="_blank">@L["View"]</a>
+            }
+        </div>
+    </div>
+</form>

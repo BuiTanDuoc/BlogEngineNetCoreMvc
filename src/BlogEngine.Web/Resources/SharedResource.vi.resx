@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="xml:space" default="preserve" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="'{0}' and '{1}' do not match." xml:space="preserve"><value>'{0}' và '{1}' không khớp.</value></data>
+  <data name="A category cannot be its own parent." xml:space="preserve"><value>Một chuyên mục không thể là cha của chính nó.</value></data>
+  <data name="A page cannot be its own ancestor." xml:space="preserve"><value>Một trang không thể là tổ tiên của chính nó.</value></data>
+  <data name="Access denied" xml:space="preserve"><value>Truy cập bị từ chối</value></data>
+  <data name="Active" xml:space="preserve"><value>Đang hoạt động</value></data>
+  <data name="Active (can sign in)" xml:space="preserve"><value>Hoạt động (được phép đăng nhập)</value></data>
+  <data name="Add" xml:space="preserve"><value>Thêm</value></data>
+  <data name="Add link" xml:space="preserve"><value>Thêm liên kết</value></data>
+  <data name="Admin" xml:space="preserve"><value>Quản trị</value></data>
+  <data name="Administration" xml:space="preserve"><value>Quản trị hệ thống</value></data>
+  <data name="All" xml:space="preserve"><value>Tất cả</value></data>
+  <data name="All posts" xml:space="preserve"><value>Tất cả bài viết</value></data>
+  <data name="Allow comments" xml:space="preserve"><value>Cho phép bình luận</value></data>
+  <data name="Another tag already uses that name." xml:space="preserve"><value>Đã có thẻ khác dùng tên này.</value></data>
+  <data name="Approve" xml:space="preserve"><value>Duyệt</value></data>
+  <data name="Approved ({0})" xml:space="preserve"><value>Đã duyệt ({0})</value></data>
+  <data name="Archive" xml:space="preserve"><value>Lưu trữ</value></data>
+  <data name="Archive: {0}" xml:space="preserve"><value>Lưu trữ: {0}</value></data>
+  <data name="At least 8 characters." xml:space="preserve"><value>Tối thiểu 8 ký tự.</value></data>
+  <data name="At least 8 characters. The user must change it at first sign-in." xml:space="preserve"><value>Tối thiểu 8 ký tự. Người dùng phải đổi mật khẩu ở lần đăng nhập đầu tiên.</value></data>
+  <data name="At least one active administrator is required." xml:space="preserve"><value>Phải còn ít nhất một quản trị viên đang hoạt động.</value></data>
+  <data name="Author" xml:space="preserve"><value>Tác giả</value></data>
+  <data name="Awaiting moderation" xml:space="preserve"><value>Đang chờ duyệt</value></data>
+  <data name="Back to the home page" xml:space="preserve"><value>Về trang chủ</value></data>
+  <data name="Bio" xml:space="preserve"><value>Giới thiệu</value></data>
+  <data name="Blog" xml:space="preserve"><value>Blog</value></data>
+  <data name="Blog URL" xml:space="preserve"><value>URL blog</value></data>
+  <data name="Blog name" xml:space="preserve"><value>Tên blog</value></data>
+  <data name="Blog time ({0}). Empty = now. A future date schedules the post." xml:space="preserve"><value>Giờ theo blog ({0}). Để trống = bây giờ. Chọn ngày trong tương lai để hẹn giờ đăng.</value></data>
+  <data name="Blogroll" xml:space="preserve"><value>Blogroll</value></data>
+  <data name="Bold" xml:space="preserve"><value>Đậm</value></data>
+  <data name="Browse by topic" xml:space="preserve"><value>Duyệt theo chủ đề</value></data>
+  <data name="Browse the archive" xml:space="preserve"><value>Xem kho lưu trữ</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Hủy</value></data>
+  <data name="Categories" xml:space="preserve"><value>Chuyên mục</value></data>
+  <data name="Category created." xml:space="preserve"><value>Đã tạo chuyên mục.</value></data>
+  <data name="Category deleted. Posts were kept." xml:space="preserve"><value>Đã xóa chuyên mục. Các bài viết vẫn được giữ lại.</value></data>
+  <data name="Category saved." xml:space="preserve"><value>Đã lưu chuyên mục.</value></data>
+  <data name="Category: {0}" xml:space="preserve"><value>Chuyên mục: {0}</value></data>
+  <data name="Change password" xml:space="preserve"><value>Đổi mật khẩu</value></data>
+  <data name="Close comments after N days (0 = never)" xml:space="preserve"><value>Đóng bình luận sau N ngày (0 = không bao giờ)</value></data>
+  <data name="Code" xml:space="preserve"><value>Mã</value></data>
+  <data name="Comment" xml:space="preserve"><value>Bình luận</value></data>
+  <data name="Comments" xml:space="preserve"><value>Bình luận</value></data>
+  <data name="Comments are closed for this post." xml:space="preserve"><value>Bài viết này đã đóng bình luận.</value></data>
+  <data name="Comments are closed." xml:space="preserve"><value>Bình luận đã đóng.</value></data>
+  <data name="Comments are moderated and appear after approval." xml:space="preserve"><value>Bình luận được kiểm duyệt và sẽ hiển thị sau khi được duyệt.</value></data>
+  <data name="Confirm new password" xml:space="preserve"><value>Xác nhận mật khẩu mới</value></data>
+  <data name="Contact" xml:space="preserve"><value>Liên hệ</value></data>
+  <data name="Contact form intro (HTML)" xml:space="preserve"><value>Lời giới thiệu form liên hệ (HTML)</value></data>
+  <data name="Contact form thank-you message (HTML)" xml:space="preserve"><value>Lời cảm ơn sau khi gửi liên hệ (HTML)</value></data>
+  <data name="Contact page &amp; scripts" xml:space="preserve"><value>Trang liên hệ &amp; script</value></data>
+  <data name="Content" xml:space="preserve"><value>Nội dung</value></data>
+  <data name="Content (HTML)" xml:space="preserve"><value>Nội dung (HTML)</value></data>
+  <data name="Create" xml:space="preserve"><value>Tạo</value></data>
+  <data name="Create user" xml:space="preserve"><value>Tạo người dùng</value></data>
+  <data name="Current password" xml:space="preserve"><value>Mật khẩu hiện tại</value></data>
+  <data name="Current password is incorrect." xml:space="preserve"><value>Mật khẩu hiện tại không đúng.</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Bảng điều khiển</value></data>
+  <data name="Date" xml:space="preserve"><value>Ngày</value></data>
+  <data name="Default language" xml:space="preserve"><value>Ngôn ngữ mặc định</value></data>
+  <data name="Delete" xml:space="preserve"><value>Xóa</value></data>
+  <data name="Delete forever" xml:space="preserve"><value>Xóa vĩnh viễn</value></data>
+  <data name="Delete this category? Posts are kept." xml:space="preserve"><value>Xóa chuyên mục này? Các bài viết vẫn được giữ lại.</value></data>
+  <data name="Delete this file? Posts that use it will show a broken link." xml:space="preserve"><value>Xóa tệp này? Các bài viết đang dùng sẽ bị hỏng liên kết.</value></data>
+  <data name="Delete this link?" xml:space="preserve"><value>Xóa liên kết này?</value></data>
+  <data name="Delete this message?" xml:space="preserve"><value>Xóa tin nhắn này?</value></data>
+  <data name="Delete this page permanently?" xml:space="preserve"><value>Xóa vĩnh viễn trang này?</value></data>
+  <data name="Delete this post and its comments permanently?" xml:space="preserve"><value>Xóa vĩnh viễn bài viết này cùng các bình luận?</value></data>
+  <data name="Delete this tag from all posts?" xml:space="preserve"><value>Xóa thẻ này khỏi tất cả bài viết?</value></data>
+  <data name="Delete this user?" xml:space="preserve"><value>Xóa người dùng này?</value></data>
+  <data name="Description" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="Description / excerpt" xml:space="preserve"><value>Mô tả / đoạn trích</value></data>
+  <data name="Display" xml:space="preserve"><value>Hiển thị</value></data>
+  <data name="Display name" xml:space="preserve"><value>Tên hiển thị</value></data>
+  <data name="Drafts" xml:space="preserve"><value>Bản nháp</value></data>
+  <data name="Drafts ({0})" xml:space="preserve"><value>Bản nháp ({0})</value></data>
+  <data name="Edit" xml:space="preserve"><value>Sửa</value></data>
+  <data name="Edit category" xml:space="preserve"><value>Sửa chuyên mục</value></data>
+  <data name="Edit link" xml:space="preserve"><value>Sửa liên kết</value></data>
+  <data name="Edit page" xml:space="preserve"><value>Sửa trang</value></data>
+  <data name="Edit post" xml:space="preserve"><value>Sửa bài viết</value></data>
+  <data name="Edit this page" xml:space="preserve"><value>Sửa trang này</value></data>
+  <data name="Edit user" xml:space="preserve"><value>Sửa người dùng</value></data>
+  <data name="Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Email (not published)" xml:space="preserve"><value>Email (không công khai)</value></data>
+  <data name="Email address" xml:space="preserve"><value>Địa chỉ email</value></data>
+  <data name="Email me on new comments (needs the Smtp section in appsettings)" xml:space="preserve"><value>Gửi email khi có bình luận mới (cần cấu hình mục Smtp trong appsettings)</value></data>
+  <data name="Email me when a comment is added" xml:space="preserve"><value>Gửi email cho tôi khi có bình luận mới</value></data>
+  <data name="Email subject prefix" xml:space="preserve"><value>Tiền tố tiêu đề email</value></data>
+  <data name="Empty file." xml:space="preserve"><value>Tệp rỗng.</value></data>
+  <data name="Enable comments" xml:space="preserve"><value>Bật bình luận</value></data>
+  <data name="Enable post ratings" xml:space="preserve"><value>Bật đánh giá bài viết</value></data>
+  <data name="Enter a valid http(s) URL." xml:space="preserve"><value>Nhập một URL http(s) hợp lệ.</value></data>
+  <data name="Enter at least 2 characters to search." xml:space="preserve"><value>Nhập ít nhất 2 ký tự để tìm kiếm.</value></data>
+  <data name="Error" xml:space="preserve"><value>Lỗi</value></data>
+  <data name="Examples: UTC, Asia/Ho_Chi_Minh, Europe/Berlin (Windows ids such as SE Asia Standard Time also work on Windows)." xml:space="preserve"><value>Ví dụ: UTC, Asia/Ho_Chi_Minh, Europe/Berlin (trên Windows có thể dùng id như SE Asia Standard Time).</value></data>
+  <data name="Feed URL" xml:space="preserve"><value>URL feed</value></data>
+  <data name="File URL" xml:space="preserve"><value>URL tệp</value></data>
+  <data name="File content does not match its extension." xml:space="preserve"><value>Nội dung tệp không khớp với phần mở rộng.</value></data>
+  <data name="File deleted." xml:space="preserve"><value>Đã xóa tệp.</value></data>
+  <data name="File is larger than 10 MB." xml:space="preserve"><value>Tệp lớn hơn 10 MB.</value></data>
+  <data name="Formatting" xml:space="preserve"><value>Định dạng</value></data>
+  <data name="General" xml:space="preserve"><value>Chung</value></data>
+  <data name="Home" xml:space="preserve"><value>Trang chủ</value></data>
+  <data name="Image" xml:space="preserve"><value>Ảnh</value></data>
+  <data name="Images (JPG, PNG, GIF, WebP) and PDF, up to 10 MB each." xml:space="preserve"><value>Ảnh (JPG, PNG, GIF, WebP) và PDF, tối đa 10 MB mỗi tệp.</value></data>
+  <data name="Invalid username or password." xml:space="preserve"><value>Tên đăng nhập hoặc mật khẩu không đúng.</value></data>
+  <data name="Italic" xml:space="preserve"><value>Nghiêng</value></data>
+  <data name="Keywords" xml:space="preserve"><value>Từ khóa</value></data>
+  <data name="Language" xml:space="preserve"><value>Ngôn ngữ</value></data>
+  <data name="Last sign-in" xml:space="preserve"><value>Đăng nhập gần nhất</value></data>
+  <data name="Latest" xml:space="preserve"><value>Mới nhất</value></data>
+  <data name="Latest comments" xml:space="preserve"><value>Bình luận mới nhất</value></data>
+  <data name="Leave a comment" xml:space="preserve"><value>Để lại bình luận</value></data>
+  <data name="Leave this field empty" xml:space="preserve"><value>Để trống ô này</value></data>
+  <data name="Link" xml:space="preserve"><value>Liên kết</value></data>
+  <data name="Link added." xml:space="preserve"><value>Đã thêm liên kết.</value></data>
+  <data name="Link deleted." xml:space="preserve"><value>Đã xóa liên kết.</value></data>
+  <data name="Link saved." xml:space="preserve"><value>Đã lưu liên kết.</value></data>
+  <data name="List" xml:space="preserve"><value>Danh sách</value></data>
+  <data name="MMM d, yyyy" xml:space="preserve"><value>dd/MM/yyyy</value></data>
+  <data name="MMM d, yyyy HH:mm" xml:space="preserve"><value>dd/MM/yyyy HH:mm</value></data>
+  <data name="MMMM d, yyyy" xml:space="preserve"><value>d MMMM, yyyy</value></data>
+  <data name="Main" xml:space="preserve"><value>Chính</value></data>
+  <data name="Mark read" xml:space="preserve"><value>Đánh dấu đã đọc</value></data>
+  <data name="Media" xml:space="preserve"><value>Thư viện</value></data>
+  <data name="Message" xml:space="preserve"><value>Nội dung</value></data>
+  <data name="Message deleted." xml:space="preserve"><value>Đã xóa tin nhắn.</value></data>
+  <data name="Messages" xml:space="preserve"><value>Tin nhắn</value></data>
+  <data name="Moderate comments before publishing" xml:space="preserve"><value>Kiểm duyệt bình luận trước khi hiển thị</value></data>
+  <data name="Move the page to trash first." xml:space="preserve"><value>Hãy chuyển trang vào thùng rác trước.</value></data>
+  <data name="Move the post to trash first." xml:space="preserve"><value>Hãy chuyển bài viết vào thùng rác trước.</value></data>
+  <data name="Move this post to trash?" xml:space="preserve"><value>Chuyển bài viết này vào thùng rác?</value></data>
+  <data name="Move to trash" xml:space="preserve"><value>Chuyển vào thùng rác</value></data>
+  <data name="Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="New category" xml:space="preserve"><value>Chuyên mục mới</value></data>
+  <data name="New on the site" xml:space="preserve"><value>Mới trên trang</value></data>
+  <data name="New page" xml:space="preserve"><value>Trang mới</value></data>
+  <data name="New password" xml:space="preserve"><value>Mật khẩu mới</value></data>
+  <data name="New post" xml:space="preserve"><value>Bài viết mới</value></data>
+  <data name="New user" xml:space="preserve"><value>Người dùng mới</value></data>
+  <data name="Newer" xml:space="preserve"><value>Mới hơn</value></data>
+  <data name="No categories yet." xml:space="preserve"><value>Chưa có chuyên mục nào.</value></data>
+  <data name="No categories." xml:space="preserve"><value>Không có chuyên mục.</value></data>
+  <data name="No comments yet." xml:space="preserve"><value>Chưa có bình luận nào.</value></data>
+  <data name="No file." xml:space="preserve"><value>Không có tệp.</value></data>
+  <data name="No files uploaded yet." xml:space="preserve"><value>Chưa có tệp nào được tải lên.</value></data>
+  <data name="No links." xml:space="preserve"><value>Không có liên kết.</value></data>
+  <data name="No messages." xml:space="preserve"><value>Không có tin nhắn.</value></data>
+  <data name="No pages." xml:space="preserve"><value>Không có trang nào.</value></data>
+  <data name="No posts found." xml:space="preserve"><value>Không tìm thấy bài viết.</value></data>
+  <data name="No posts in this category yet." xml:space="preserve"><value>Chuyên mục này chưa có bài viết.</value></data>
+  <data name="No posts in this period." xml:space="preserve"><value>Không có bài viết trong khoảng thời gian này.</value></data>
+  <data name="No posts with this tag yet." xml:space="preserve"><value>Chưa có bài viết nào với thẻ này.</value></data>
+  <data name="No ratings yet" xml:space="preserve"><value>Chưa có đánh giá</value></data>
+  <data name="No tags." xml:space="preserve"><value>Không có thẻ.</value></data>
+  <data name="Not spam" xml:space="preserve"><value>Không phải spam</value></data>
+  <data name="Notes, tutorials and ideas" xml:space="preserve"><value>Ghi chú, hướng dẫn và ý tưởng</value></data>
+  <data name="Nothing found. Try different keywords." xml:space="preserve"><value>Không tìm thấy gì. Hãy thử từ khóa khác.</value></data>
+  <data name="Nothing here." xml:space="preserve"><value>Chưa có gì ở đây.</value></data>
+  <data name="Nothing yet." xml:space="preserve"><value>Chưa có gì.</value></data>
+  <data name="Notification email" xml:space="preserve"><value>Email nhận thông báo</value></data>
+  <data name="Older" xml:space="preserve"><value>Cũ hơn</value></data>
+  <data name="Only image files are allowed." xml:space="preserve"><value>Chỉ cho phép tệp ảnh.</value></data>
+  <data name="Order" xml:space="preserve"><value>Thứ tự</value></data>
+  <data name="Page created." xml:space="preserve"><value>Đã tạo trang.</value></data>
+  <data name="Page deleted permanently." xml:space="preserve"><value>Đã xóa vĩnh viễn trang.</value></data>
+  <data name="Page moved to trash." xml:space="preserve"><value>Đã chuyển trang vào thùng rác.</value></data>
+  <data name="Page not found" xml:space="preserve"><value>Không tìm thấy trang</value></data>
+  <data name="Page restored." xml:space="preserve"><value>Đã khôi phục trang.</value></data>
+  <data name="Page saved." xml:space="preserve"><value>Đã lưu trang.</value></data>
+  <data name="Page {0} of {1}" xml:space="preserve"><value>Trang {0} / {1}</value></data>
+  <data name="Pages" xml:space="preserve"><value>Trang</value></data>
+  <data name="Parent" xml:space="preserve"><value>Cha</value></data>
+  <data name="Parent category" xml:space="preserve"><value>Chuyên mục cha</value></data>
+  <data name="Parent page" xml:space="preserve"><value>Trang cha</value></data>
+  <data name="Password" xml:space="preserve"><value>Mật khẩu</value></data>
+  <data name="Password is required (min. 8 characters)." xml:space="preserve"><value>Cần nhập mật khẩu (tối thiểu 8 ký tự).</value></data>
+  <data name="Password reset. The user must choose a new password at next sign-in." xml:space="preserve"><value>Đã đặt lại mật khẩu. Người dùng phải chọn mật khẩu mới ở lần đăng nhập tiếp theo.</value></data>
+  <data name="Pending ({0})" xml:space="preserve"><value>Chờ duyệt ({0})</value></data>
+  <data name="Pick a topic" xml:space="preserve"><value>Chọn một chủ đề</value></data>
+  <data name="Plain text only; HTML is not allowed." xml:space="preserve"><value>Chỉ nhận văn bản thuần; không cho phép HTML.</value></data>
+  <data name="Post comment" xml:space="preserve"><value>Gửi bình luận</value></data>
+  <data name="Post created." xml:space="preserve"><value>Đã tạo bài viết.</value></data>
+  <data name="Post deleted permanently." xml:space="preserve"><value>Đã xóa vĩnh viễn bài viết.</value></data>
+  <data name="Post moved to trash." xml:space="preserve"><value>Đã chuyển bài viết vào thùng rác.</value></data>
+  <data name="Post navigation" xml:space="preserve"><value>Điều hướng bài viết</value></data>
+  <data name="Post restored." xml:space="preserve"><value>Đã khôi phục bài viết.</value></data>
+  <data name="Post saved." xml:space="preserve"><value>Đã lưu bài viết.</value></data>
+  <data name="Posts" xml:space="preserve"><value>Bài viết</value></data>
+  <data name="Posts by {0}" xml:space="preserve"><value>Bài viết của {0}</value></data>
+  <data name="Posts per feed" xml:space="preserve"><value>Số bài mỗi feed</value></data>
+  <data name="Posts per page" xml:space="preserve"><value>Số bài mỗi trang</value></data>
+  <data name="Powered by ASP.NET Core" xml:space="preserve"><value>Chạy trên ASP.NET Core</value></data>
+  <data name="Preview" xml:space="preserve"><value>Xem trước</value></data>
+  <data name="Publish" xml:space="preserve"><value>Đăng</value></data>
+  <data name="Publish date" xml:space="preserve"><value>Ngày đăng</value></data>
+  <data name="Published" xml:space="preserve"><value>Đã đăng</value></data>
+  <data name="Published ({0})" xml:space="preserve"><value>Đã đăng ({0})</value></data>
+  <data name="Published posts" xml:space="preserve"><value>Bài viết đã đăng</value></data>
+  <data name="Quote" xml:space="preserve"><value>Trích dẫn</value></data>
+  <data name="Rate" xml:space="preserve"><value>Đánh giá</value></data>
+  <data name="Rating: {1} / 5 ({0} vote)" xml:space="preserve"><value>Đánh giá: {1} / 5 ({0} lượt)</value></data>
+  <data name="Rating: {1} / 5 ({0} votes)" xml:space="preserve"><value>Đánh giá: {1} / 5 ({0} lượt)</value></data>
+  <data name="Raw HTML/JS (e.g. analytics). Only administrators can edit this." xml:space="preserve"><value>HTML/JS thô (ví dụ mã thống kê). Chỉ quản trị viên được chỉnh sửa.</value></data>
+  <data name="Read the blog" xml:space="preserve"><value>Đọc blog</value></data>
+  <data name="Recent comments in sidebar" xml:space="preserve"><value>Số bình luận mới hiển thị</value></data>
+  <data name="Recent posts" xml:space="preserve"><value>Bài viết mới</value></data>
+  <data name="Recent posts in sidebar" xml:space="preserve"><value>Số bài mới hiển thị</value></data>
+  <data name="Recently edited posts" xml:space="preserve"><value>Bài viết sửa gần đây</value></data>
+  <data name="Related posts" xml:space="preserve"><value>Bài viết liên quan</value></data>
+  <data name="Remember me" xml:space="preserve"><value>Ghi nhớ đăng nhập</value></data>
+  <data name="Rename" xml:space="preserve"><value>Đổi tên</value></data>
+  <data name="Reply" xml:space="preserve"><value>Trả lời</value></data>
+  <data name="Replying to" xml:space="preserve"><value>Đang trả lời</value></data>
+  <data name="Request ID: {0}" xml:space="preserve"><value>Mã yêu cầu: {0}</value></data>
+  <data name="Reset" xml:space="preserve"><value>Đặt lại</value></data>
+  <data name="Reset password" xml:space="preserve"><value>Đặt lại mật khẩu</value></data>
+  <data name="Restore" xml:space="preserve"><value>Khôi phục</value></data>
+  <data name="Roles" xml:space="preserve"><value>Vai trò</value></data>
+  <data name="Save" xml:space="preserve"><value>Lưu</value></data>
+  <data name="Save settings" xml:space="preserve"><value>Lưu cài đặt</value></data>
+  <data name="Search" xml:space="preserve"><value>Tìm kiếm</value></data>
+  <data name="Search posts…" xml:space="preserve"><value>Tìm bài viết…</value></data>
+  <data name="Search results for “{0}”" xml:space="preserve"><value>Kết quả tìm kiếm cho “{0}”</value></data>
+  <data name="Search the blog…" xml:space="preserve"><value>Tìm trong blog…</value></data>
+  <data name="Search…" xml:space="preserve"><value>Tìm kiếm…</value></data>
+  <data name="Send" xml:space="preserve"><value>Gửi</value></data>
+  <data name="Settings" xml:space="preserve"><value>Cài đặt</value></data>
+  <data name="Settings saved." xml:space="preserve"><value>Đã lưu cài đặt.</value></data>
+  <data name="Show Gravatar avatars" xml:space="preserve"><value>Hiển thị ảnh đại diện Gravatar</value></data>
+  <data name="Show Gravatar avatars (loads images from gravatar.com)" xml:space="preserve"><value>Hiển thị ảnh đại diện Gravatar (tải ảnh từ gravatar.com)</value></data>
+  <data name="Show in menu" xml:space="preserve"><value>Hiển thị trong menu</value></data>
+  <data name="Show related posts" xml:space="preserve"><value>Hiển thị bài viết liên quan</value></data>
+  <data name="Sign in" xml:space="preserve"><value>Đăng nhập</value></data>
+  <data name="Sign out" xml:space="preserve"><value>Đăng xuất</value></data>
+  <data name="Site" xml:space="preserve"><value>Trang web</value></data>
+  <data name="Skip to content" xml:space="preserve"><value>Bỏ qua tới nội dung</value></data>
+  <data name="Slug" xml:space="preserve"><value>Slug</value></data>
+  <data name="Slug (URL)" xml:space="preserve"><value>Slug (URL)</value></data>
+  <data name="Something went wrong" xml:space="preserve"><value>Đã xảy ra lỗi</value></data>
+  <data name="Sort order" xml:space="preserve"><value>Thứ tự sắp xếp</value></data>
+  <data name="Spam" xml:space="preserve"><value>Spam</value></data>
+  <data name="Spam ({0})" xml:space="preserve"><value>Spam ({0})</value></data>
+  <data name="Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="Subject" xml:space="preserve"><value>Chủ đề</value></data>
+  <data name="Tag deleted." xml:space="preserve"><value>Đã xóa thẻ.</value></data>
+  <data name="Tag name" xml:space="preserve"><value>Tên thẻ</value></data>
+  <data name="Tag name must be 1-50 characters." xml:space="preserve"><value>Tên thẻ phải dài từ 1 đến 50 ký tự.</value></data>
+  <data name="Tag renamed." xml:space="preserve"><value>Đã đổi tên thẻ.</value></data>
+  <data name="Tag: {0}" xml:space="preserve"><value>Thẻ: {0}</value></data>
+  <data name="Tags" xml:space="preserve"><value>Thẻ</value></data>
+  <data name="Tags (comma separated)" xml:space="preserve"><value>Thẻ (phân tách bằng dấu phẩy)</value></data>
+  <data name="Tags are created automatically when you type them in a post." xml:space="preserve"><value>Thẻ được tạo tự động khi bạn nhập vào bài viết.</value></data>
+  <data name="Temporary password" xml:space="preserve"><value>Mật khẩu tạm thời</value></data>
+  <data name="Thank you" xml:space="preserve"><value>Cảm ơn bạn</value></data>
+  <data name="Thank you, your comment is awaiting moderation." xml:space="preserve"><value>Cảm ơn bạn, bình luận của bạn đang chờ được duyệt.</value></data>
+  <data name="Thank you, your comment was added." xml:space="preserve"><value>Cảm ơn bạn, bình luận của bạn đã được thêm.</value></data>
+  <data name="Thanks for rating!" xml:space="preserve"><value>Cảm ơn bạn đã đánh giá!</value></data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve"><value>Trường {0} chỉ được dài tối đa {1} ký tự.</value></data>
+  <data name="The field {0} must be a string with a minimum length of {2} and a maximum length of {1}." xml:space="preserve"><value>Trường {0} phải dài từ {2} đến {1} ký tự.</value></data>
+  <data name="The field {0} must be between {1} and {2}." xml:space="preserve"><value>Trường {0} phải nằm trong khoảng từ {1} đến {2}.</value></data>
+  <data name="The new password must have at least 8 characters." xml:space="preserve"><value>Mật khẩu mới phải có ít nhất 8 ký tự.</value></data>
+  <data name="The page you are looking for does not exist or was moved." xml:space="preserve"><value>Trang bạn tìm không tồn tại hoặc đã được chuyển đi.</value></data>
+  <data name="The parent cannot be a child of this category." xml:space="preserve"><value>Chuyên mục cha không thể là con của chuyên mục này.</value></data>
+  <data name="The server could not complete your request. Please try again later." xml:space="preserve"><value>Máy chủ không thể hoàn tất yêu cầu của bạn. Vui lòng thử lại sau.</value></data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve"><value>Trường {0} không phải là địa chỉ email hợp lệ.</value></data>
+  <data name="The {0} field is not a valid fully-qualified http, https, or ftp URL." xml:space="preserve"><value>Trường {0} không phải là URL http, https hoặc ftp hợp lệ.</value></data>
+  <data name="The {0} field is required." xml:space="preserve"><value>Trường {0} là bắt buộc.</value></data>
+  <data name="There are no posts yet." xml:space="preserve"><value>Chưa có bài viết nào.</value></data>
+  <data name="This author has not published anything yet." xml:space="preserve"><value>Tác giả này chưa đăng bài nào.</value></data>
+  <data name="This page is not published yet — only you can see this preview." xml:space="preserve"><value>Trang này chưa được đăng — chỉ bạn xem được bản xem trước này.</value></data>
+  <data name="This post is in the trash. Restore it from the post list to make it available again." xml:space="preserve"><value>Bài viết này đang ở trong thùng rác. Hãy khôi phục từ danh sách bài viết để dùng lại.</value></data>
+  <data name="This post is not public yet — only you can see this preview." xml:space="preserve"><value>Bài viết này chưa công khai — chỉ bạn xem được bản xem trước này.</value></data>
+  <data name="This user has posts. Deactivate the account instead of deleting it." xml:space="preserve"><value>Người dùng này có bài viết. Hãy vô hiệu hóa tài khoản thay vì xóa.</value></data>
+  <data name="This username is already taken." xml:space="preserve"><value>Tên đăng nhập này đã được sử dụng.</value></data>
+  <data name="Time zone (IANA or Windows id)" xml:space="preserve"><value>Múi giờ (IANA hoặc id Windows)</value></data>
+  <data name="Title" xml:space="preserve"><value>Tiêu đề</value></data>
+  <data name="Toggle light/dark theme" xml:space="preserve"><value>Chuyển giao diện sáng/tối</value></data>
+  <data name="Too many failed attempts. Try again in {0} minute." xml:space="preserve"><value>Sai quá nhiều lần. Hãy thử lại sau {0} phút.</value></data>
+  <data name="Too many failed attempts. Try again in {0} minutes." xml:space="preserve"><value>Sai quá nhiều lần. Hãy thử lại sau {0} phút.</value></data>
+  <data name="Topics" xml:space="preserve"><value>Chủ đề</value></data>
+  <data name="Tracking script (inserted before &lt;/body&gt;)" xml:space="preserve"><value>Script theo dõi (chèn trước &lt;/body&gt;)</value></data>
+  <data name="Trash" xml:space="preserve"><value>Thùng rác</value></data>
+  <data name="Trash ({0})" xml:space="preserve"><value>Thùng rác ({0})</value></data>
+  <data name="URL" xml:space="preserve"><value>URL</value></data>
+  <data name="Unapprove" xml:space="preserve"><value>Bỏ duyệt</value></data>
+  <data name="Unknown time zone id." xml:space="preserve"><value>Id múi giờ không hợp lệ.</value></data>
+  <data name="Unread messages" xml:space="preserve"><value>Tin nhắn chưa đọc</value></data>
+  <data name="Unsupported file type (images and PDF only)." xml:space="preserve"><value>Loại tệp không được hỗ trợ (chỉ ảnh và PDF).</value></data>
+  <data name="Unsupported language." xml:space="preserve"><value>Ngôn ngữ không được hỗ trợ.</value></data>
+  <data name="Upload" xml:space="preserve"><value>Tải lên</value></data>
+  <data name="Use as front page" xml:space="preserve"><value>Dùng làm trang chủ</value></data>
+  <data name="Use letters, digits and . _ - @ only." xml:space="preserve"><value>Chỉ dùng chữ cái, chữ số và các ký tự . _ - @</value></data>
+  <data name="User '{0}' created. They must change the password at first sign-in." xml:space="preserve"><value>Đã tạo người dùng '{0}'. Họ phải đổi mật khẩu ở lần đăng nhập đầu tiên.</value></data>
+  <data name="User deleted." xml:space="preserve"><value>Đã xóa người dùng.</value></data>
+  <data name="User saved." xml:space="preserve"><value>Đã lưu người dùng.</value></data>
+  <data name="Username" xml:space="preserve"><value>Tên đăng nhập</value></data>
+  <data name="Users" xml:space="preserve"><value>Người dùng</value></data>
+  <data name="View" xml:space="preserve"><value>Xem</value></data>
+  <data name="View site" xml:space="preserve"><value>Xem trang web</value></data>
+  <data name="Visitors can switch the language themselves; this is the default for new visitors." xml:space="preserve"><value>Khách truy cập có thể tự đổi ngôn ngữ; đây là mặc định cho khách mới.</value></data>
+  <data name="Website" xml:space="preserve"><value>Website</value></data>
+  <data name="Write a post" xml:space="preserve"><value>Viết bài</value></data>
+  <data name="XFN relationship" xml:space="preserve"><value>Quan hệ XFN</value></data>
+  <data name="You cannot deactivate yourself or remove your own administrator role." xml:space="preserve"><value>Bạn không thể tự vô hiệu hóa hoặc gỡ vai trò quản trị của chính mình.</value></data>
+  <data name="You cannot delete your own account." xml:space="preserve"><value>Bạn không thể xóa tài khoản của chính mình.</value></data>
+  <data name="You must choose a new password before continuing." xml:space="preserve"><value>Bạn phải chọn mật khẩu mới trước khi tiếp tục.</value></data>
+  <data name="Your account does not have permission to open this page." xml:space="preserve"><value>Tài khoản của bạn không có quyền mở trang này.</value></data>
+  <data name="Your password was changed." xml:space="preserve"><value>Mật khẩu của bạn đã được thay đổi.</value></data>
+  <data name="Your rating" xml:space="preserve"><value>Đánh giá của bạn</value></data>
+  <data name="approved" xml:space="preserve"><value>đã duyệt</value></data>
+  <data name="auto from name" xml:space="preserve"><value>tự tạo từ tên</value></data>
+  <data name="auto from title" xml:space="preserve"><value>tự tạo từ tiêu đề</value></data>
+  <data name="draft" xml:space="preserve"><value>bản nháp</value></data>
+  <data name="front page" xml:space="preserve"><value>trang chủ</value></data>
+  <data name="https://example.com" xml:space="preserve"><value>https://example.com</value></data>
+  <data name="inactive" xml:space="preserve"><value>ngừng hoạt động</value></data>
+  <data name="never" xml:space="preserve"><value>chưa bao giờ</value></data>
+  <data name="new" xml:space="preserve"><value>mới</value></data>
+  <data name="news, tutorial" xml:space="preserve"><value>tin tức, hướng dẫn</value></data>
+  <data name="not published" xml:space="preserve"><value>không công khai</value></data>
+  <data name="on" xml:space="preserve"><value>trên</value></data>
+  <data name="pending" xml:space="preserve"><value>chờ duyệt</value></data>
+  <data name="scheduled" xml:space="preserve"><value>hẹn giờ</value></data>
+  <data name="{0} comment" xml:space="preserve"><value>{0} bình luận</value></data>
+  <data name="{0} comments" xml:space="preserve"><value>{0} bình luận</value></data>
+  <data name="{0} file uploaded." xml:space="preserve"><value>Đã tải lên {0} tệp.</value></data>
+  <data name="{0} files uploaded." xml:space="preserve"><value>Đã tải lên {0} tệp.</value></data>
+  <data name="{0} min read" xml:space="preserve"><value>{0} phút đọc</value></data>
+  <data name="{0} post" xml:space="preserve"><value>{0} bài viết</value></data>
+  <data name="{0} posts" xml:space="preserve"><value>{0} bài viết</value></data>
+  <data name="{0} result" xml:space="preserve"><value>{0} kết quả</value></data>
+  <data name="{0} results" xml:space="preserve"><value>{0} kết quả</value></data>
+  <data name="— none —" xml:space="preserve"><value>— không có —</value></data>
+  <data name="Read more" xml:space="preserve"><value>Xem thêm</value></data>
+  <data name="by" xml:space="preserve"><value>bởi</value></data>
+  <data name="Featured posts" xml:space="preserve"><value>Bài nổi bật</value></data>
+  <data name="Appearance" xml:space="preserve"><value>Giao diện</value></data>
+  <data name="Theme" xml:space="preserve"><value>Giao diện (theme)</value></data>
+  <data name="Unknown theme." xml:space="preserve"><value>Giao diện không hợp lệ.</value></data>
+  <data name="Applies to the public site. Indigo has a gradient header, featured posts, a sidebar and a dark footer." xml:space="preserve"><value>Áp dụng cho trang công khai. Indigo có thanh đầu trang chuyển màu, bài nổi bật, thanh bên và chân trang tối.</value></data>
+  <data name="Social links appear in the Indigo footer when filled in." xml:space="preserve"><value>Liên kết mạng xã hội sẽ hiện ở chân trang Indigo khi được điền.</value></data>
+  <data name="Facebook URL" xml:space="preserve"><value>Liên kết Facebook</value></data>
+  <data name="X (Twitter) URL" xml:space="preserve"><value>Liên kết X (Twitter)</value></data>
+  <data name="LinkedIn URL" xml:space="preserve"><value>Liên kết LinkedIn</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menu</value></data>
+  <data name="Back to top" xml:space="preserve"><value>Lên đầu trang</value></data>
+  <data name="Sidebar" xml:space="preserve"><value>Thanh bên</value></data>
+</root>

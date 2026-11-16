@@ -1,0 +1,31 @@
+@model List<User>
+@inject ISettingsService SettingsService
+@{
+    ViewData["Title"] = L["Users"].Value;
+    var settings = await SettingsService.GetAsync();
+}
+<h1>@L["Users"]</h1>
+<div class="toolbar"><span></span><a class="btn" href="/admin/users/create">@L["New user"]</a></div>
+<div class="table-wrap">
+<table class="grid">
+    <thead><tr><th>@L["Username"]</th><th>@L["Name"]</th><th>@L["Email"]</th><th>@L["Roles"]</th><th>@L["Last sign-in"]</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr>
+            <td><a href="/admin/users/edit/@u.Id"><strong>@u.UserName</strong></a> @if (!u.IsActive) { <span class="status">@L["inactive"]</span> }</td>
+            <td>@u.DisplayName</td>
+            <td>@u.EmailAddress</td>
+            <td>@string.Join(", ", u.Roles.Select(r => r.Name))</td>
+            <td>@(u.LastLoginTime?.ToBlogTime(settings).ToString("yyyy-MM-dd HH:mm") ?? L["never"].Value)</td>
+            <td>
+                @if (u.Id != User.GetUserId())
+                {
+                    <form asp-action="Delete" asp-route-id="@u.Id" method="post" data-confirm="@L["Delete this user?"]"><button class="btn btn-small btn-danger">@L["Delete"]</button></form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>

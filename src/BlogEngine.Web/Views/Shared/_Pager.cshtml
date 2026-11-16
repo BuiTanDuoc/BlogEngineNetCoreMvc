@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@model IPaged
+@{
+    string Link(int p)
+    {
+        var pairs = Context.Request.Query
+            .Where(kv => !string.Equals(kv.Key, "page", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(kv => kv.Value.Select(v => new KeyValuePair<string, string>(kv.Key, v ?? "")));
+        var qb = new QueryBuilder(pairs);
+        if (p > 1) { qb.Add("page", p.ToString()); }
+        return Context.Request.Path.Add(qb.ToQueryString());
+    }
+}
+@if (Model.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pagination">
+        @if (Model.HasPrevious) { <a rel="prev" href="@Link(Model.Page - 1)">&larr; @L["Newer"]</a> } else { <span class="disabled">&larr; @L["Newer"]</span> }
+        <span class="pager-info">@L["Page {0} of {1}", Model.Page, Model.TotalPages]</span>
+        @if (Model.HasNext) { <a rel="next" href="@Link(Model.Page + 1)">@L["Older"] &rarr;</a> } else { <span class="disabled">@L["Older"] &rarr;</span> }
+    </nav>
+}

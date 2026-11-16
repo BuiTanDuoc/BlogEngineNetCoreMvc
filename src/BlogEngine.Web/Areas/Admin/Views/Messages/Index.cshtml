@@ -1,0 +1,25 @@
+@model List<ContactMessage>
+@inject ISettingsService SettingsService
+@{
+    ViewData["Title"] = L["Messages"].Value;
+    var settings = await SettingsService.GetAsync();
+}
+<h1>@L["Messages"]</h1>
+@foreach (var m in Model)
+{
+    <div class="panel">
+        <div class="toolbar" style="margin-bottom:.5rem">
+            <div>
+                @if (!m.IsRead) { <span class="badge">@L["new"]</span> }
+                <strong>@m.Name</strong> <a href="mailto:@m.Email">&lt;@m.Email&gt;</a>
+                <div class="muted small">@m.Date.ToBlogTime(settings).ToString("yyyy-MM-dd HH:mm") @(string.IsNullOrWhiteSpace(m.Subject) ? "" : "· " + m.Subject)</div>
+            </div>
+            <div class="row-actions">
+                @if (!m.IsRead) { <form asp-action="MarkRead" asp-route-id="@m.Id" method="post"><button class="btn btn-small btn-secondary">@L["Mark read"]</button></form> }
+                <form asp-action="Delete" asp-route-id="@m.Id" method="post" data-confirm="@L["Delete this message?"]"><button class="btn btn-small btn-danger">@L["Delete"]</button></form>
+            </div>
+        </div>
+        <div class="comment-text">@m.Message</div>
+    </div>
+}
+@if (Model.Count == 0) { <p class="muted">@L["No messages."]</p> }

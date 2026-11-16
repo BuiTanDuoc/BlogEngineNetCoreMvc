@@ -1,0 +1,28 @@
+@model IndigoHomeViewModel
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+}
+
+@section Hero {
+    @if (Model.Featured.Count > 0)
+    {
+        <section class="ix-hero" aria-label="@L["Featured posts"]">
+            @foreach (var p in Model.Featured)
+            {
+                <a class="ix-hero-item" asp-controller="Posts" asp-action="Details" asp-route-slug="@p.Slug">
+                    @if (p.ImageUrl is { } img)
+                    {
+                        <img src="@img" alt="" loading="lazy" />
+                    }
+                    <span class="ix-hero-text">
+                        <span class="ix-hero-title">@p.Title</span>
+                        <time class="ix-hero-date" datetime="@p.DateCreated.ToString("o")">@p.DateCreated.ToBlogTime(settings).ToString(L["MMM d, yyyy"].Value)</time>
+                    </span>
+                </a>
+            }
+        </section>
+    }
+}
+
+<partial name="PostList" model="Model.Posts" />

@@ -1,0 +1,52 @@
+@model DashboardViewModel
+@inject ISettingsService SettingsService
+@{
+    ViewData["Title"] = L["Dashboard"].Value;
+    var settings = await SettingsService.GetAsync();
+}
+<h1>@L["Dashboard"]</h1>
+
+<div class="stats">
+    <div class="stat"><strong>@Model.PublishedPosts</strong>@L["Published posts"]</div>
+    <div class="stat"><strong>@Model.DraftPosts</strong>@L["Drafts"]</div>
+    <div class="stat"><strong>@Model.Pages</strong>@L["Pages"]</div>
+    <div class="stat"><strong>@Model.Comments</strong>@L["Comments"]</div>
+    <div class="stat"><a href="/admin/comments"><strong>@Model.PendingComments</strong>@L["Awaiting moderation"]</a></div>
+    <div class="stat"><strong>@Model.SpamComments</strong>@L["Spam"]</div>
+    <div class="stat"><strong>@Model.UnreadMessages</strong>@L["Unread messages"]</div>
+    <div class="stat"><strong>@Model.Users</strong>@L["Users"]</div>
+</div>
+
+<p><a class="btn" href="/admin/posts/create">@L["Write a post"]</a></p>
+
+<div class="panel">
+    <h2>@L["Recently edited posts"]</h2>
+    @if (Model.RecentPosts.Count == 0) { <p class="muted">@L["Nothing yet."]</p> }
+    else
+    {
+        <ul>
+            @foreach (var p in Model.RecentPosts)
+            {
+                <li><a href="/admin/posts/edit/@p.Id">@p.Title</a> <span class="muted small">· @p.DateModified.ToBlogTime(settings).ToString("g")</span></li>
+            }
+        </ul>
+    }
+</div>
+
+<div class="panel">
+    <h2>@L["Latest comments"]</h2>
+    @if (Model.RecentComments.Count == 0) { <p class="muted">@L["No comments yet."]</p> }
+    else
+    {
+        <ul>
+            @foreach (var c in Model.RecentComments)
+            {
+                <li>
+                    <strong>@c.Author</strong> @L["on"] <em>@c.Post?.Title</em>
+                    <span class="muted small">· @(c.IsApproved ? L["approved"] : L["pending"])</span>
+                    <div class="muted">@c.Content.Excerpt(120)</div>
+                </li>
+            }
+        </ul>
+    }
+</div>

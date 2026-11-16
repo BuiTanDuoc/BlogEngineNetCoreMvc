@@ -1,0 +1,22 @@
+@model CategoryEditModel
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? L["New category"].Value : L["Edit category"].Value;
+    var parents = (List<Category>)ViewBag.Parents;
+}
+<h1>@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="form form-wide">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="field"><label asp-for="Name"></label><input asp-for="Name" maxlength="100" required autofocus /></div>
+    <div class="field"><label asp-for="Slug"></label><input asp-for="Slug" maxlength="120" placeholder="@L["auto from name"]" /></div>
+    <div class="field"><label asp-for="Description"></label><textarea asp-for="Description" rows="3"></textarea></div>
+    <div class="field">
+        <label asp-for="ParentId"></label>
+        <select asp-for="ParentId">
+            <option value="">@L["— none —"]</option>
+            @foreach (var p in parents) { <option value="@p.Id" selected="@(Model.ParentId == p.Id)">@p.Name</option> }
+        </select>
+    </div>
+    <button type="submit" class="btn">@(isNew ? L["Create"] : L["Save"])</button>
+    <a class="btn btn-secondary" href="/admin/categories">@L["Cancel"]</a>
+</form>

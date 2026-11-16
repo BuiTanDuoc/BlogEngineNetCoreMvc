@@ -1,0 +1,21 @@
+@model LoginInput
+@{ ViewData["Title"] = L["Sign in"].Value; }
+<header class="page-heading"><h1>@L["Sign in"]</h1></header>
+
+<form asp-action="Login" method="post" class="form form-narrow">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="field">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" autocomplete="username" autofocus required />
+    </div>
+    <div class="field">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" autocomplete="current-password" required />
+    </div>
+    <div class="field field-check">
+        <input asp-for="RememberMe" />
+        <label asp-for="RememberMe"></label>
+    </div>
+    <button type="submit" class="btn">@L["Sign in"]</button>
+</form>

@@ -1,0 +1,49 @@
+@model UserEditModel
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? L["New user"].Value : L["Edit user"].Value;
+    var allRoles = (List<string>)ViewBag.AllRoles;
+}
+<h1>@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="form form-wide">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="field">
+        <label asp-for="UserName"></label>
+        @if (isNew) { <input asp-for="UserName" maxlength="100" required autofocus /> }
+        else { <input asp-for="UserName" readonly /> }
+    </div>
+    @if (isNew)
+    {
+        <div class="field">
+            <label asp-for="Password">@L["Temporary password"]</label>
+            <input asp-for="Password" type="password" autocomplete="new-password" minlength="8" required />
+            <span class="muted small">@L["At least 8 characters. The user must change it at first sign-in."]</span>
+        </div>
+    }
+    <div class="field"><label asp-for="DisplayName"></label><input asp-for="DisplayName" maxlength="100" /></div>
+    <div class="field"><label asp-for="EmailAddress"></label><input asp-for="EmailAddress" type="email" maxlength="255" /></div>
+    <div class="field"><label asp-for="Bio"></label><textarea asp-for="Bio" rows="3"></textarea></div>
+    <div class="field">
+        <label>@L["Roles"]</label>
+        <div class="checklist">
+            @foreach (var r in allRoles)
+            {
+                <label><input type="checkbox" name="Roles" value="@r" checked="@Model.Roles.Contains(r)" /> @r</label>
+            }
+        </div>
+    </div>
+    <div class="field"><label class="inline"><input asp-for="IsActive" /> @L["Active (can sign in)"]</label></div>
+    <button type="submit" class="btn">@(isNew ? L["Create user"] : L["Save"])</button>
+    <a class="btn btn-secondary" href="/admin/users">@L["Cancel"]</a>
+</form>
+
+@if (!isNew)
+{
+    <div class="panel form-wide" style="margin-top:2rem">
+        <h2>@L["Reset password"]</h2>
+        <form asp-action="ResetPassword" asp-route-id="@Model.Id" method="post" class="row-actions">
+            <input type="password" name="newPassword" minlength="8" placeholder="@L["New password"]" autocomplete="new-password" style="max-width:18rem" required />
+            <button class="btn btn-secondary">@L["Reset"]</button>
+        </form>
+    </div>
+}

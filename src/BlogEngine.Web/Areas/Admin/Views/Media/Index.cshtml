@@ -1,0 +1,29 @@
+@model List<MediaFile>
+@{ ViewData["Title"] = L["Media"].Value; }
+<h1>@L["Media"]</h1>
+
+<form asp-action="Upload" method="post" enctype="multipart/form-data" class="panel row-actions">
+    <input type="file" name="files" multiple accept="image/png,image/jpeg,image/gif,image/webp,application/pdf" required />
+    <button class="btn">@L["Upload"]</button>
+    <span class="muted small">@L["Images (JPG, PNG, GIF, WebP) and PDF, up to 10 MB each."]</span>
+</form>
+
+<div class="thumb-grid">
+    @foreach (var f in Model)
+    {
+        <div class="thumb">
+            @if (f.IsImage) { <a href="@f.Url" target="_blank"><img src="@f.Url" alt="" loading="lazy" /></a> }
+            else { <a href="@f.Url" target="_blank"><div class="file-icon">PDF</div></a> }
+            <input type="text" readonly value="@f.Url" onclick="this.select()" aria-label="@L["File URL"]" />
+            <div class="muted">@((f.Size / 1024.0).ToString("0.#")) KB · @f.Modified.ToString("yyyy-MM-dd")</div>
+            @if (User.IsAdministrator())
+            {
+                <form asp-action="Delete" method="post" data-confirm="@L["Delete this file? Posts that use it will show a broken link."]">
+                    <input type="hidden" name="path" value="@f.RelativePath" />
+                    <button class="btn btn-small btn-danger" style="margin-top:.4rem">@L["Delete"]</button>
+                </form>
+            }
+        </div>
+    }
+</div>
+@if (Model.Count == 0) { <p class="muted">@L["No files uploaded yet."]</p> }

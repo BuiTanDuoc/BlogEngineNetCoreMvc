@@ -1,0 +1,5 @@
+@{ ViewData["Title"] = L["Error"].Value; }
+<header class="page-heading"><h1>@L["Something went wrong"]</h1></header>
+<p>@L["The server could not complete your request. Please try again later."]</p>
+<p class="muted small">@L["Request ID: {0}", (object)ViewBag.RequestId]</p>
+<p><a href="/">@L["Back to the home page"]</a></p>

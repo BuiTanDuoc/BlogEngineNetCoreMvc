@@ -1,0 +1,5 @@
+@model List<BlogEngine.Web.Data.Entities.Page>
+@foreach (var p in Model)
+{
+    <a asp-controller="Pages" asp-action="Details" asp-route-slug="@p.Slug">@p.Title</a>
+}

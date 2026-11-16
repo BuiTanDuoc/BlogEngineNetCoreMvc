@@ -1,0 +1,65 @@
+@model BlogEngine.Web.Areas.Admin.Models.PostListViewModel
+@inject ISettingsService SettingsService
+@{
+    ViewData["Title"] = L["Posts"].Value;
+    var settings = await SettingsService.GetAsync();
+    string Tab(string s) => Model.Status == s ? "active" : "";
+}
+<h1>@L["Posts"]</h1>
+
+<div class="toolbar">
+    <div class="tabs">
+        <a class="@Tab("all")" href="?status=all">@L["All"]</a>
+        <a class="@Tab("published")" href="?status=published">@L["Published ({0})", Model.PublishedCount]</a>
+        <a class="@Tab("draft")" href="?status=draft">@L["Drafts ({0})", Model.DraftCount]</a>
+        <a class="@Tab("trash")" href="?status=trash">@L["Trash ({0})", Model.TrashCount]</a>
+    </div>
+    <div style="display:flex;gap:.5rem">
+        <form method="get" class="search-form">
+            <input type="hidden" name="status" value="@Model.Status" />
+            <input type="search" name="q" value="@Model.Query" placeholder="@L["Search posts…"]" />
+        </form>
+        <a class="btn" href="/admin/posts/create">@L["New post"]</a>
+    </div>
+</div>
+
+<div class="table-wrap">
+<table class="grid">
+    <thead><tr><th>@L["Title"]</th><th>@L["Author"]</th><th>@L["Categories"]</th><th>@L["Date"]</th><th>@L["Status"]</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model.Posts.Items)
+    {
+        var scheduled = p.IsPublished && p.DateCreated > DateTime.UtcNow;
+        <tr>
+            <td><a href="/admin/posts/edit/@p.Id"><strong>@p.Title</strong></a></td>
+            <td>@p.Author?.Name</td>
+            <td>@string.Join(", ", p.Categories.Select(c => c.Name))</td>
+            <td>@p.DateCreated.ToBlogTime(settings).ToString("yyyy-MM-dd HH:mm")</td>
+            <td>
+                @if (p.IsDeleted) { <span class="status">@L["Trash"].Value.ToLower()</span> }
+                else if (scheduled) { <span class="status">@L["scheduled"]</span> }
+                else if (p.IsPublished) { <span class="status status-published">@L["Published"].Value.ToLower()</span> }
+                else { <span class="status status-draft">@L["draft"]</span> }
+            </td>
+            <td>
+                <div class="row-actions">
+                    @if (p.IsDeleted)
+                    {
+                        <form asp-action="Restore" asp-route-id="@p.Id" method="post"><button class="btn btn-small btn-secondary">@L["Restore"]</button></form>
+                        <form asp-action="Delete" asp-route-id="@p.Id" method="post" data-confirm="@L["Delete this post and its comments permanently?"]"><button class="btn btn-small btn-danger">@L["Delete forever"]</button></form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-small btn-secondary" asp-area="" asp-controller="Posts" asp-action="Details" asp-route-slug="@p.Slug" target="_blank">@L["View"]</a>
+                        <form asp-action="Trash" asp-route-id="@p.Id" method="post"><button class="btn btn-small btn-secondary">@L["Trash"]</button></form>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+    @if (!Model.Posts.Items.Any()) { <tr><td colspan="6" class="muted">@L["No posts found."]</td></tr> }
+    </tbody>
+</table>
+</div>
+
+<partial name="~/Views/Shared/_Pager.cshtml" model="Model.Posts" />

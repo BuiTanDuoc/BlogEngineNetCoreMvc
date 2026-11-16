@@ -1,0 +1,17 @@
+@model BlogRollEditModel
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? L["Add link"].Value : L["Edit link"].Value;
+}
+<h1>@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@Model.Id" method="post" class="form form-wide">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="field"><label asp-for="Title"></label><input asp-for="Title" maxlength="255" required autofocus /></div>
+    <div class="field"><label asp-for="BlogUrl"></label><input asp-for="BlogUrl" type="text" maxlength="500" required placeholder="@L["https://example.com"]" /></div>
+    <div class="field"><label asp-for="FeedUrl"></label><input asp-for="FeedUrl" type="text" maxlength="500" /></div>
+    <div class="field"><label asp-for="Description"></label><input asp-for="Description" maxlength="500" /></div>
+    <div class="field"><label asp-for="Xfn"></label><input asp-for="Xfn" maxlength="100" /></div>
+    <div class="field"><label asp-for="SortIndex"></label><input asp-for="SortIndex" type="number" /></div>
+    <button type="submit" class="btn">@(isNew ? L["Add"] : L["Save"])</button>
+    <a class="btn btn-secondary" href="/admin/blogroll">@L["Cancel"]</a>
+</form>

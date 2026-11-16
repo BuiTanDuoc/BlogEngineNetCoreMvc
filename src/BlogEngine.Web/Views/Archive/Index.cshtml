@@ -1,0 +1,23 @@
+@model ArchiveViewModel
+@{ ViewData["Title"] = L["Archive"].Value; }
+<header class="page-heading"><h1>@L["Archive"]</h1></header>
+
+@if (Model.Groups.Count == 0)
+{
+    <p class="muted">@L["There are no posts yet."]</p>
+}
+@foreach (var g in Model.Groups)
+{
+    <section class="archive-group">
+        <h2><a href="/@g.Key.Year/@g.Key.Month.ToString("00")">@(new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM yyyy"))</a> <span class="muted">(@g.Count())</span></h2>
+        <ul>
+            @foreach (var e in g)
+            {
+                <li>
+                    <a asp-controller="Posts" asp-action="Details" asp-route-slug="@e.Slug">@e.Title</a>
+                    <span class="muted small">@(e.CommentCount > 0 ? "· " + L.Plural(e.CommentCount, "{0} comment", "{0} comments") : "")</span>
+                </li>
+            }
+        </ul>
+    </section>
+}

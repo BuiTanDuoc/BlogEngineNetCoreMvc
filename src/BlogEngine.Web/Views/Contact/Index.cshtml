@@ -1,0 +1,35 @@
+@model ContactInput
+@{
+    ViewData["Title"] = L["Contact"].Value;
+    var settings = (BlogSettings)ViewBag.Settings;
+}
+<header class="page-heading"><h1>@L["Contact"]</h1></header>
+@Html.Raw(settings.ContactFormMessage)
+
+<form asp-action="Index" method="post" class="form">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="field">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" maxlength="100" required autocomplete="name" />
+        <span asp-validation-for="Name" class="field-error"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" type="email" maxlength="255" required autocomplete="email" />
+        <span asp-validation-for="Email" class="field-error"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Subject"></label>
+        <input asp-for="Subject" maxlength="255" />
+    </div>
+    <div class="field">
+        <label asp-for="Message"></label>
+        <textarea asp-for="Message" rows="8" maxlength="5000" required></textarea>
+        <span asp-validation-for="Message" class="field-error"></span>
+    </div>
+    <div class="hp" aria-hidden="true">
+        <label for="Website2">@L["Leave this field empty"]</label>
+        <input type="text" name="Website2" id="Website2" tabindex="-1" autocomplete="off" />
+    </div>
+    <button type="submit" class="btn">@L["Send"]</button>
+</form>

@@ -1,0 +1,44 @@
+@model FooterViewModel
+@inject ISettingsService SettingsService
+@{ var settings = await SettingsService.GetAsync(); }
+<div class="footer-grid">
+    <div>
+        <h4>@settings.Name</h4>
+        <p>@settings.Description</p>
+    </div>
+    <div>
+        <h4>@L["Topics"]</h4>
+        <ul>
+            @foreach (var c in Model.Categories)
+            {
+                <li><a asp-controller="Categories" asp-action="Details" asp-route-slug="@c.Slug">@c.Name</a> <span class="small">(@c.Count)</span></li>
+            }
+            @if (Model.Categories.Count == 0) { <li>—</li> }
+        </ul>
+    </div>
+    <div>
+        <h4>@L["Recent posts"]</h4>
+        <ul>
+            @foreach (var p in Model.RecentPosts)
+            {
+                <li><a asp-controller="Posts" asp-action="Details" asp-route-slug="@p.Slug">@p.Title</a></li>
+            }
+            @if (Model.RecentPosts.Count == 0) { <li>—</li> }
+        </ul>
+    </div>
+    <div>
+        <h4>@L["Site"]</h4>
+        <ul>
+            <li><a href="/blog">@L["All posts"]</a></li>
+            <li><a asp-controller="Archive" asp-action="Index">@L["Archive"]</a></li>
+            <li><a asp-controller="Contact" asp-action="Index">@L["Contact"]</a></li>
+            <li><a href="/feed">RSS</a> · <a href="/feed/atom">Atom</a></li>
+            @foreach (var b in Model.BlogRoll)
+            {
+                var url = b.BlogUrl.ToSafeHttpUrl();
+                if (url is null) { continue; }
+                <li><a href="@url" rel="@(string.IsNullOrWhiteSpace(b.Xfn) ? "noopener" : b.Xfn + " noopener")" target="_blank">@b.Title ↗</a></li>
+            }
+        </ul>
+    </div>
+</div>

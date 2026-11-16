@@ -1,0 +1,5 @@
+@{ ViewData["Title"] = L["Page not found"].Value; }
+<header class="page-heading"><h1>@L["Page not found"]</h1></header>
+<p>@L["The page you are looking for does not exist or was moved."]</p>
+<form action="/search" method="get" class="search-form"><input type="search" name="q" placeholder="@L["Search the blog…"]" /></form>
+<p><a href="/">@L["Back to the home page"]</a></p>

@@ -1,0 +1,59 @@
+@model PostSummary
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+    var summary = string.IsNullOrWhiteSpace(Model.Description) ? Model.Content.Excerpt(170) : Model.Description.Excerpt(200);
+    var first = Model.Categories.FirstOrDefault();
+}
+@if (settings.IsIndigo)
+{
+    var img = Model.ImageUrl;
+    var when = Model.DateCreated.ToBlogTime(settings);
+    <article class="ix-post@(img is null ? " no-thumb" : "")">
+        @if (img is not null)
+        {
+            <a class="ix-thumb" tabindex="-1" aria-hidden="true" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug"><img src="@img" alt="" loading="lazy" /></a>
+        }
+        <div class="ix-post-body">
+            <h2><a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Title</a></h2>
+            <div class="ix-meta">
+                <span>@L["by"] @Model.AuthorName</span>
+                <span class="ix-sl">/</span>
+                <time datetime="@Model.DateCreated.ToString("o")">@when.ToString(L["MMM d, yyyy"].Value)</time>
+                @if (Model.Categories.Count > 0)
+                {
+                    <span class="ix-sl">/</span>
+                    <span>
+                        @for (var i = 0; i < Model.Categories.Count; i++)
+                        {
+                            <a asp-controller="Categories" asp-action="Details" asp-route-slug="@Model.Categories[i].Slug">@Model.Categories[i].Name</a>@(i < Model.Categories.Count - 1 ? ", " : "")
+                        }
+                    </span>
+                }
+            </div>
+            <p>@summary</p>
+            <a class="ix-more" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug">@L["Read more"]</a>
+        </div>
+    </article>
+}
+else
+{
+<article class="card hoverable">
+    @if (first is not null)
+    {
+        <span class="label">@first.Name</span>
+    }
+    <h3><a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Title</a></h3>
+    <p>@summary</p>
+    <div class="card-meta">
+        <time datetime="@Model.DateCreated.ToString("o")">@Model.DateCreated.ToBlogTime(settings).ToString(L["MMM d, yyyy"].Value)</time>
+        <span class="sep">·</span>
+        <span>@L["{0} min read", Model.ReadingMinutes]</span>
+        @if (Model.CommentCount > 0)
+        {
+            <span class="sep">·</span>
+            <span>@L.Plural(Model.CommentCount, "{0} comment", "{0} comments")</span>
+        }
+    </div>
+</article>
+}

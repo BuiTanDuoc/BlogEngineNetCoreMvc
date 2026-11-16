@@ -1,0 +1,73 @@
+@model HomeViewModel
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+}
+
+<section class="hero">
+    <div>
+        <span class="eyebrow">@L["Notes, tutorials and ideas"]</span>
+        <h1>@settings.Name</h1>
+        <p class="lead">@settings.Description</p>
+        <div class="hero-actions">
+            <a class="btn" href="/blog">@L["Read the blog"]</a>
+            <a class="btn btn-ghost" asp-controller="Archive" asp-action="Index">@L["Browse the archive"]</a>
+        </div>
+    </div>
+    <div class="terminal" aria-hidden="true">
+        <div class="terminal-bar"><i></i><i></i><i></i><span>@settings.Name — bash</span></div>
+        <div class="terminal-body"><span class="prompt">$</span> whoami
+<span class="out">@settings.Name</span>
+<span class="prompt">$</span> ls topics/
+<span class="out">@(Model.Categories.Count == 0 ? "—" : string.Join("  ", Model.Categories.Select(c => c.Slug + "/")))</span>
+<span class="prompt">$</span> wc -l posts
+<span class="out">@Model.TotalPosts</span>
+<span class="prompt">$</span> <span class="cursor"></span></div>
+    </div>
+</section>
+
+@if (Model.Categories.Count > 0)
+{
+    <section class="section">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">@L["Browse by topic"]</span>
+                <h2>@L["Pick a topic"]</h2>
+            </div>
+        </div>
+        <div class="cards">
+            @foreach (var c in Model.Categories)
+            {
+                <a class="card topic" asp-controller="Categories" asp-action="Details" asp-route-slug="@c.Slug">
+                    <span class="count">@L.Plural(c.Count, "{0} post", "{0} posts")</span>
+                    <h3>@c.Name</h3>
+                    @if (!string.IsNullOrWhiteSpace(c.Description)) { <p>@c.Description</p> }
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<section class="section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">@L["Latest"]</span>
+            <h2>@L["New on the site"]</h2>
+        </div>
+        <a href="/blog">@L["All posts"] →</a>
+    </div>
+
+    @if (Model.Latest.Count == 0)
+    {
+        <p class="muted">@L["There are no posts yet."]</p>
+    }
+    else
+    {
+        <div class="cards">
+            @foreach (var p in Model.Latest)
+            {
+                <partial name="_PostCard" model="p" />
+            }
+        </div>
+    }
+</section>
