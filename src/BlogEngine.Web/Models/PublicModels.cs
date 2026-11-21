@@ -182,6 +182,15 @@ public class IndigoHomeViewModel
     public required PostListViewModel Posts { get; init; }
 }
 
+/// <summary>Trang chủ giao diện BLK: hero, bài nổi bật dạng card, chủ đề + danh sách bài có phân trang.</summary>
+public class BlkHomeViewModel
+{
+    public List<PostSummary> Featured { get; init; } = new();
+    public List<CategoryCard> Categories { get; init; } = new();
+    public int TotalPosts { get; init; }
+    public required PostListViewModel Posts { get; init; }
+}
+
 public class FooterViewModel
 {
     public List<CategoryCard> Categories { get; init; } = new();

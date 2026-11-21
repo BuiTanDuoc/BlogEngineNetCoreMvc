@@ -1,0 +1,64 @@
+@model BlkHomeViewModel
+@inject ISettingsService SettingsService
+@{
+    var settings = await SettingsService.GetAsync();
+}
+
+@section Hero {
+    <section class="bk-hero">
+        <div class="bk-wrap">
+            <div class="bk-hero-copy">
+                <span class="bk-eyebrow">@L["Notes, tutorials and ideas"]</span>
+                <h1>@settings.Name</h1>
+                <p class="bk-lead">@settings.Description</p>
+                <div class="bk-hero-actions">
+                    <a class="btn btn-bk" href="/blog">@L["Read the blog"]</a>
+                    <a class="btn btn-bk-ghost" asp-controller="Archive" asp-action="Index">@L["Browse the archive"]</a>
+                </div>
+                <div class="bk-hero-stat">@L.Plural(Model.TotalPosts, "{0} post", "{0} posts")</div>
+            </div>
+
+            @if (Model.Featured.Count > 0)
+            {
+                <div class="bk-featured" aria-label="@L["Featured posts"]">
+                    @foreach (var p in Model.Featured)
+                    {
+                        var first = p.Categories.FirstOrDefault();
+                        <a class="bk-fcard@(p.ImageUrl is null ? " no-img" : "")" asp-controller="Posts" asp-action="Details" asp-route-slug="@p.Slug">
+                            @if (p.ImageUrl is { } img)
+                            {
+                                <img src="@img" alt="" loading="lazy" />
+                            }
+                            <span class="bk-fcard-text">
+                                @if (first is not null) { <span class="bk-chip">@first.Name</span> }
+                                <span class="bk-fcard-title">@p.Title</span>
+                                <time class="bk-fcard-date" datetime="@p.DateCreated.ToString("o")">@p.DateCreated.ToBlogTime(settings).ToString(L["MMM d, yyyy"].Value)</time>
+                            </span>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@if (Model.Categories.Count > 0)
+{
+    <section class="bk-section">
+        <h2 class="bk-section-title">@L["Browse by topic"]</h2>
+        <div class="bk-topics">
+            @foreach (var c in Model.Categories)
+            {
+                <a class="bk-topic" asp-controller="Categories" asp-action="Details" asp-route-slug="@c.Slug">
+                    <span class="bk-topic-name">@c.Name</span>
+                    <span class="bk-topic-count">@L.Plural(c.Count, "{0} post", "{0} posts")</span>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+<section class="bk-section">
+    <h2 class="bk-section-title">@L["New on the site"]</h2>
+    <partial name="PostList" model="Model.Posts" />
+</section>

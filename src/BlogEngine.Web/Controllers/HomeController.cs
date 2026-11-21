@@ -40,6 +40,43 @@ public class HomeController : LocalizedController
         var visible = _db.Posts.AsNoTracking().Visible();
 
         var settings = await _settings.GetAsync();
+        if (settings.IsBlk)
+        {
+            var ordered = visible.OrderByDescending(p => p.DateCreated);
+            // Hero: bài Featured trước, thiếu thì bù bằng bài mới nhất.
+            var hero = await visible.Where(p => p.IsFeatured)
+                .OrderByDescending(p => p.DateCreated).Take(HeroCount).ToSummary().ToListAsync();
+            if (hero.Count < HeroCount)
+            {
+                var heroIds = hero.Select(p => p.Id).ToList();
+                hero.AddRange(await visible.Where(p => !heroIds.Contains(p.Id))
+                    .OrderByDescending(p => p.DateCreated).Take(HeroCount - hero.Count).ToSummary().ToListAsync());
+            }
+            var blkTopics = await _db.Categories.AsNoTracking()
+                .Select(c => new CategoryCard
+                {
+                    Name = c.Name,
+                    Slug = c.Slug,
+                    Description = c.Description,
+                    Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
+                })
+                .Where(c => c.Count > 0)
+                .OrderByDescending(c => c.Count)
+                .Take(HomeTopicCount)
+                .ToListAsync();
+            return View("Blk", new BlkHomeViewModel
+            {
+                Featured = hero,
+                Categories = blkTopics,
+                TotalPosts = await visible.CountAsync(),
+                Posts = new PostListViewModel
+                {
+                    Posts = await PagedList<PostSummary>.CreateAsync(ordered.ToSummary(), 1, settings.PostsPerPage),
+                    EmptyMessage = L["There are no posts yet."]
+                }
+            });
+        }
+
         if (settings.IsIndigo)
         {
             var ordered = visible.OrderByDescending(p => p.DateCreated);

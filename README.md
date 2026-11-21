@@ -87,6 +87,20 @@ card bài viết, footer nhiều cột). CSS/HTML tự viết, không dùng tài
 - Trang chủ: hero (tên + mô tả blog từ Admin → Settings), khối chủ đề, 6 bài mới nhất. `/blog` là danh sách đầy đủ có phân trang.
   Nếu đặt một Page làm "front page" thì trang đó thay thế trang chủ.
 
+### Theme "BLK Design" (phong cách BLK Design System Pro)
+
+Chọn ở Admin → Settings → Appearance → Theme (`blk`). Nền xanh navy, card tím than có bóng nổi, màu nhấn magenta → tím,
+nút gradient chéo chữ in hoa, header trong suốt rồi đặc lại khi cuộn, chân trang gradient tròn. Mặc định **tối**
+(nút sáng/tối ở header vẫn dùng được; chưa chọn thì là tối).
+
+- Files: `Views/Shared/_LayoutBlk.cshtml`, `Views/Home/Blk.cshtml` (hero + 3 bài nổi bật + chủ đề + danh sách), nhánh `IsBlk` trong
+  `Views/Shared/_PostCard.cshtml`, `wwwroot/css/blk.css` (class tiền tố `bk-`), đoạn JS cuối `wwwroot/js/site.js`.
+- Đổi màu: biến `--bk-primary`, `--bk-primary-states`, `--accent`… ở đầu `blk.css` (`:root` = sáng, `:root[data-theme="dark"]` = tối).
+- CSS/HTML tự viết lấy cảm hứng từ BLK, **không** copy mã/font/icon của BLK Design System Pro (đây là sản phẩm có bản quyền);
+  font khai báo là Poppins nhưng không nhúng — thiếu thì rơi về font hệ thống. Muốn dùng Poppins, tự thêm `<link>` Google Fonts hoặc file font
+  vào `_LayoutBlk.cshtml`.
+- Dùng chung sidebar, trang bài viết, form, bình luận… với các theme khác (được style lại bằng `.bk …` trong `blk.css`).
+
 ## Đa ngôn ngữ (English / Tiếng Việt)
 
 - Nút `EN | VI` ở header (và ở sidebar admin) lưu lựa chọn vào cookie. Chưa chọn thì dùng **Default language**

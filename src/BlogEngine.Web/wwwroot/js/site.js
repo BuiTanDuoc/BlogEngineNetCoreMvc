@@ -22,7 +22,8 @@
     mq.addEventListener('change', function (e) {
       var stored = null;
       try { stored = localStorage.getItem('theme'); } catch (err) { }
-      if (!stored) apply(e.matches ? 'dark' : 'light');
+      // Giao diện BLK mặc định tối (data-theme-default) nên không đi theo hệ điều hành.
+      if (!stored && !root.hasAttribute('data-theme-default')) apply(e.matches ? 'dark' : 'light');
     });
   }
 })();
@@ -67,6 +68,29 @@
     });
   }
   var top = document.getElementById('ix-top');
+  if (top) {
+    top.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+
+// ---- Giao diện BLK: menu mobile, header đặc lại khi cuộn, nút "lên đầu trang" ----
+(function () {
+  var header = document.querySelector('.bk-header');
+  if (!header) return;
+  var burger = document.getElementById('bk-burger');
+  if (burger) {
+    burger.addEventListener('click', function () {
+      var open = header.classList.toggle('open');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  var top = document.getElementById('bk-top');
   if (top) {
     top.addEventListener('click', function (e) {
       e.preventDefault();

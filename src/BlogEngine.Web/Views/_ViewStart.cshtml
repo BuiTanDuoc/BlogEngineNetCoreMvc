@@ -1,5 +1,6 @@
 @inject ISettingsService SettingsService
 @{
     // Giao diện công khai chọn trong Admin > Settings > Appearance.
-    Layout = (await SettingsService.GetAsync()).IsIndigo ? "_LayoutIndigo" : "_Layout";
+    var themeSettings = await SettingsService.GetAsync();
+    Layout = themeSettings.IsBlk ? "_LayoutBlk" : themeSettings.IsIndigo ? "_LayoutIndigo" : "_Layout";
 }

@@ -363,8 +363,9 @@
   <data name="Appearance" xml:space="preserve"><value>Giao diện</value></data>
   <data name="Theme" xml:space="preserve"><value>Giao diện (theme)</value></data>
   <data name="Unknown theme." xml:space="preserve"><value>Giao diện không hợp lệ.</value></data>
-  <data name="Applies to the public site. Indigo has a gradient header, featured posts, a sidebar and a dark footer." xml:space="preserve"><value>Áp dụng cho trang công khai. Indigo có thanh đầu trang chuyển màu, bài nổi bật, thanh bên và chân trang tối.</value></data>
-  <data name="Social links appear in the Indigo footer when filled in." xml:space="preserve"><value>Liên kết mạng xã hội sẽ hiện ở chân trang Indigo khi được điền.</value></data>
+  <data name="Applies to the public site. Indigo has a gradient header, featured posts, a sidebar and a dark footer. BLK Design has a dark neon look with glowing cards and gradient buttons." xml:space="preserve"><value>Áp dụng cho trang công khai. Indigo có thanh đầu trang chuyển màu, bài nổi bật, thanh bên và chân trang tối. BLK Design có nền tối phát sáng, card nổi và nút gradient.</value></data>
+  <data name="Social links appear in the Indigo and BLK footers when filled in." xml:space="preserve"><value>Liên kết mạng xã hội sẽ hiện ở chân trang Indigo và BLK khi được điền.</value></data>
+  <data name="Footer" xml:space="preserve"><value>Chân trang</value></data>
   <data name="Facebook URL" xml:space="preserve"><value>Liên kết Facebook</value></data>
   <data name="X (Twitter) URL" xml:space="preserve"><value>Liên kết X (Twitter)</value></data>
   <data name="LinkedIn URL" xml:space="preserve"><value>Liên kết LinkedIn</value></data>

@@ -68,7 +68,7 @@ public class BlogSettings
     [Display(Name = "Contact form thank-you message (HTML)")]
     public string ContactThankMessage { get; set; } = "<h1>Thank you</h1><p>The message was sent.</p>";
 
-    /// <summary>Giao diện công khai: "indigo" (mặc định) hoặc "paper". Xem <see cref="SiteThemes"/>.</summary>
+    /// <summary>Giao diện công khai: "indigo" (mặc định), "blk" hoặc "paper". Xem <see cref="SiteThemes"/>.</summary>
     [Display(Name = "Theme")]
     public string Theme { get; set; } = SiteThemes.Indigo;
 
@@ -84,6 +84,9 @@ public class BlogSettings
     /// <summary>Getter-only nên SettingsService (chỉ lưu property có setter) bỏ qua.</summary>
     public bool IsIndigo => string.Equals(Theme, SiteThemes.Indigo, StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>Giao diện BLK (phong cách BLK Design System Pro: nền tối, card phát sáng, nút gradient).</summary>
+    public bool IsBlk => string.Equals(Theme, SiteThemes.Blk, StringComparison.OrdinalIgnoreCase);
+
     [Display(Name = "Tracking script (inserted before </body>)")]
     public string TrackingScript { get; set; } = "";
 
@@ -95,10 +98,12 @@ public static class SiteThemes
 {
     public const string Paper = "paper";
     public const string Indigo = "indigo";
+    public const string Blk = "blk";
 
     public static readonly IReadOnlyList<(string Key, string Name)> All = new[]
     {
         (Indigo, "Indigo"),
+        (Blk, "BLK Design"),
         (Paper, "Paper & Terminal")
     };
 

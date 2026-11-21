@@ -5,7 +5,40 @@
     var summary = string.IsNullOrWhiteSpace(Model.Description) ? Model.Content.Excerpt(170) : Model.Description.Excerpt(200);
     var first = Model.Categories.FirstOrDefault();
 }
-@if (settings.IsIndigo)
+@if (settings.IsBlk)
+{
+    var bkImg = Model.ImageUrl;
+    <article class="bk-card@(bkImg is null ? " no-thumb" : "")@(Model.IsFeatured ? " featured" : "")">
+        @if (bkImg is not null)
+        {
+            <a class="bk-card-thumb" tabindex="-1" aria-hidden="true" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug"><img src="@bkImg" alt="" loading="lazy" /></a>
+        }
+        <div class="bk-card-body">
+            @if (Model.IsFeatured || first is not null)
+            {
+                <div class="bk-card-labels">
+                    @if (Model.IsFeatured) { <span class="bk-chip bk-chip-warm">★ @L["Featured"]</span> }
+                    @if (first is not null) { <a class="bk-chip" asp-controller="Categories" asp-action="Details" asp-route-slug="@first.Slug">@first.Name</a> }
+                </div>
+            }
+            <h3><a asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Title</a></h3>
+            <p>@summary</p>
+            <div class="bk-card-meta">
+                <span>@Model.AuthorName</span>
+                <span class="bk-dot">&middot;</span>
+                <time datetime="@Model.DateCreated.ToString("o")">@Model.DateCreated.ToBlogTime(settings).ToString(L["MMM d, yyyy"].Value)</time>
+                <span class="bk-dot">&middot;</span>
+                <span>@L["{0} min read", Model.ReadingMinutes]</span>
+                @if (Model.CommentCount > 0)
+                {
+                    <span class="bk-dot">&middot;</span>
+                    <span>@L.Plural(Model.CommentCount, "{0} comment", "{0} comments")</span>
+                }
+            </div>
+        </div>
+    </article>
+}
+else if (settings.IsIndigo)
 {
     var img = Model.ImageUrl;
     var when = Model.DateCreated.ToBlogTime(settings);
