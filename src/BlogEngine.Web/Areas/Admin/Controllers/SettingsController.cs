@@ -37,8 +37,8 @@ public class SettingsController : AdminControllerBase
         model.ContactThankMessage ??= "";
         model.TrackingScript ??= "";
         model.SocialFacebook ??= "";
-        model.SocialTwitter ??= "";
-        model.SocialLinkedIn ??= "";
+        model.SocialYoutube ??= "";
+        model.SocialChat ??= "";
 
         await _settings.SaveAsync(model);
         Flash(L["Settings saved."]);

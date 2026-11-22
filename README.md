@@ -58,6 +58,7 @@ chạy trên bản sao; mặc định kết thúc bằng `ROLLBACK` để bạn 
 |---|---|
 | Chuỗi kết nối | `ConnectionStrings:DefaultConnection` |
 | SMTP (mail comment/liên hệ) | `Smtp:*` trong appsettings/user-secrets/biến môi trường — **không** lưu trong DB như bản cũ |
+| URL công khai dùng trong link email đặt lại mật khẩu (tùy chọn) | `Hosting:PublicBaseUrl` (vd `https://blog.example.com`); để trống = lấy từ request |
 | Tin cậy `X-Forwarded-*` (chạy sau nginx/Docker) | `Hosting:TrustForwardedHeaders=true` (chỉ khi app không mở trực tiếp ra Internet) |
 | Tên blog, số bài/trang, comment, múi giờ, culture... | Admin → Settings (lưu bảng `Settings`) |
 
@@ -146,6 +147,11 @@ referrer tracking, user registration công khai (tạo user từ Admin → Users
 - Rate limit cho comment/liên hệ/đăng nhập; chặn open-redirect khi login; security header cơ bản (`nosniff`, `X-Frame-Options`).
 - Nội dung bài/trang do staff nhập là **HTML thô** (như bản gốc) — chỉ cấp role Editors cho người tin cậy. Chưa có Content-Security-Policy
   vì `TrackingScript` và nội dung bài có thể chứa script hợp lệ.
+- **Quên mật khẩu** (`/account/forgot-password`): chỉ áp dụng cho tài khoản Administrators/Editors đang hoạt động **và có email**; cần cấu hình `Smtp:*`.
+  Link chứa token Data Protection (không lưu DB), hết hạn sau 1 giờ và chỉ dùng được một lần (đổi mật khẩu là token cũ mất hiệu lực).
+  Luôn trả cùng một thông báo dù tài khoản có tồn tại hay không. Ở môi trường Development, link được ghi vào log để thử khi chưa có SMTP.
+  Khi triển khai thật, hãy lưu **khóa Data Protection** bền vững (và dùng chung nếu chạy nhiều instance), nếu không link sẽ hỏng sau khi restart.
+- Liên kết mạng xã hội ở footer (Indigo/BLK): Facebook, YouTube, Chat (Messenger/Zalo/Telegram...) — nhập ở Admin → Settings → Appearance.
 - Tìm kiếm dùng `LIKE` qua EF; blog rất lớn nên cân nhắc SQL Server Full-Text Search.
 
 ## Trạng thái kiểm chứng (nói rõ)

@@ -75,11 +75,11 @@ public class BlogSettings
     [Display(Name = "Facebook URL")]
     public string SocialFacebook { get; set; } = "";
 
-    [Display(Name = "X (Twitter) URL")]
-    public string SocialTwitter { get; set; } = "";
+    [Display(Name = "YouTube URL")]
+    public string SocialYoutube { get; set; } = "";
 
-    [Display(Name = "LinkedIn URL")]
-    public string SocialLinkedIn { get; set; } = "";
+    [Display(Name = "Chat URL")]
+    public string SocialChat { get; set; } = "";
 
     /// <summary>Getter-only nên SettingsService (chỉ lưu property có setter) bỏ qua.</summary>
     public bool IsIndigo => string.Equals(Theme, SiteThemes.Indigo, StringComparison.OrdinalIgnoreCase);

@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using BlogEngine.Web.Data;
 using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Infrastructure;
@@ -20,11 +22,25 @@ public class AccountController : LocalizedController
 
     private readonly BlogDbContext _db;
     private readonly IPasswordService _passwords;
+    private readonly IPasswordResetTokenService _resetTokens;
+    private readonly IEmailService _email;
+    private readonly ISettingsService _settings;
+    private readonly IConfiguration _config;
+    private readonly IWebHostEnvironment _env;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(BlogDbContext db, IPasswordService passwords)
+    public AccountController(BlogDbContext db, IPasswordService passwords, IPasswordResetTokenService resetTokens,
+        IEmailService email, ISettingsService settings, IConfiguration config, IWebHostEnvironment env,
+        ILogger<AccountController> logger)
     {
         _db = db;
         _passwords = passwords;
+        _resetTokens = resetTokens;
+        _email = email;
+        _settings = settings;
+        _config = config;
+        _env = env;
+        _logger = logger;
     }
 
     [HttpGet("login")]
@@ -131,6 +147,81 @@ public class AccountController : LocalizedController
 
         TempData["Message"] = L["Your password was changed."].Value;
         return RedirectAfterLogin(returnUrl, user.Roles.Any(r => r.Name is RoleNames.Administrators or RoleNames.Editors));
+    }
+
+    // ---------- Quên mật khẩu (chỉ Administrators / Editors, qua email) ----------
+
+    [HttpGet("forgot-password")]
+    public IActionResult ForgotPassword() => View(new ForgotPasswordInput());
+
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting("login")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordInput input)
+    {
+        if (!ModelState.IsValid) return View(input);
+
+        var key = input.Identifier.Trim();
+        var users = await _db.Users.Include(u => u.Roles)
+            .Where(u => u.IsActive && u.EmailAddress != null && (u.UserName == key || u.EmailAddress == key))
+            .ToListAsync();
+
+        var settings = await _settings.GetAsync();
+        foreach (var user in users.Where(u => u.Roles.Any(r => r.Name is RoleNames.Administrators or RoleNames.Editors)))
+        {
+            var token = _resetTokens.Create(user);
+            var path = Url.Action(nameof(ResetPassword), "Account", new { token }) ?? "/account/reset-password";
+            var baseUrl = _config["Hosting:PublicBaseUrl"]?.TrimEnd('/') ?? $"{Request.Scheme}://{Request.Host}";
+            var link = baseUrl + path;
+
+            if (_env.IsDevelopment())
+                _logger.LogInformation("Link đặt lại mật khẩu của {User}: {Link}", user.UserName, link);
+
+            var minutes = (int)PasswordResetTokenService.Lifetime.TotalMinutes;
+            var body =
+                $"<p>{System.Net.WebUtility.HtmlEncode(L["Hello"].Value)} {System.Net.WebUtility.HtmlEncode(user.Name)},</p>" +
+                $"<p>{System.Net.WebUtility.HtmlEncode(L["We received a request to reset your password. Click the link below to choose a new one:"].Value)}</p>" +
+                $"<p><a href=\"{System.Net.WebUtility.HtmlEncode(link)}\">{System.Net.WebUtility.HtmlEncode(link)}</a></p>" +
+                $"<p>{System.Net.WebUtility.HtmlEncode(string.Format(L["This link is valid for {0} minutes and can be used once. If you did not request it, ignore this email."].Value, minutes))}</p>";
+
+            await _email.SendAsync(user.EmailAddress!, $"[{settings.Name}] {L["Reset your password"].Value}", body);
+        }
+
+        // Luôn trả cùng một thông báo để không lộ tài khoản nào tồn tại.
+        TempData["Message"] = L["If the account exists and has an email address, a reset link has been sent."].Value;
+        return RedirectToAction(nameof(Login));
+    }
+
+    [HttpGet("reset-password")]
+    public IActionResult ResetPassword(string? token)
+    {
+        if (!_resetTokens.TryRead(token, out _, out _))
+            return View("ResetPasswordInvalid");
+        return View(new ResetPasswordInput { Token = token! });
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting("login")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordInput input)
+    {
+        if (!_resetTokens.TryRead(input.Token, out var userId, out var fingerprint))
+            return View("ResetPasswordInvalid");
+        if (!ModelState.IsValid) return View(input);
+
+        var user = await _db.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null || !user.IsActive
+            || !user.Roles.Any(r => r.Name is RoleNames.Administrators or RoleNames.Editors)
+            || !CryptographicOperations.FixedTimeEquals(
+                   Encoding.UTF8.GetBytes(_resetTokens.Fingerprint(user)), Encoding.UTF8.GetBytes(fingerprint)))
+            return View("ResetPasswordInvalid");
+
+        user.PasswordHash = _passwords.Hash(user, input.NewPassword);
+        user.MustChangePassword = false;
+        user.FailedLoginCount = 0;
+        user.LockoutEnd = null;
+        await _db.SaveChangesAsync();
+
+        TempData["Message"] = L["Your password was changed."].Value;
+        return RedirectToAction(nameof(Login));
     }
 
     [HttpGet("denied")]

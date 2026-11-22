@@ -158,6 +158,24 @@ public class ChangePasswordInput
     public string ConfirmPassword { get; set; } = "";
 }
 
+public class ForgotPasswordInput
+{
+    [Required(ErrorMessage = "The {0} field is required."), Display(Name = "Username or email")]
+    public string Identifier { get; set; } = "";
+}
+
+public class ResetPasswordInput
+{
+    [Required]
+    public string Token { get; set; } = "";
+
+    [Required(ErrorMessage = "The {0} field is required."), StringLength(100, MinimumLength = 8, ErrorMessage = "The field {0} must be a string with a minimum length of {2} and a maximum length of {1}."), DataType(DataType.Password), Display(Name = "New password")]
+    public string NewPassword { get; set; } = "";
+
+    [Required(ErrorMessage = "The {0} field is required."), DataType(DataType.Password), Compare(nameof(NewPassword), ErrorMessage = "'{0}' and '{1}' do not match."), Display(Name = "Confirm new password")]
+    public string ConfirmPassword { get; set; } = "";
+}
+
 public class CategoryCard
 {
     public string Name { get; init; } = "";

@@ -26,6 +26,7 @@ builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp")
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<IPasswordResetTokenService, PasswordResetTokenService>();
 
 // ---------- Authentication / Authorization ----------
 builder.Services

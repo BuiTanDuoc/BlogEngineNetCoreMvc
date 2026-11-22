@@ -367,11 +367,24 @@
   <data name="Social links appear in the Indigo and BLK footers when filled in." xml:space="preserve"><value>Liên kết mạng xã hội sẽ hiện ở chân trang Indigo và BLK khi được điền.</value></data>
   <data name="Footer" xml:space="preserve"><value>Chân trang</value></data>
   <data name="Facebook URL" xml:space="preserve"><value>Liên kết Facebook</value></data>
-  <data name="X (Twitter) URL" xml:space="preserve"><value>Liên kết X (Twitter)</value></data>
-  <data name="LinkedIn URL" xml:space="preserve"><value>Liên kết LinkedIn</value></data>
+  <data name="YouTube URL" xml:space="preserve"><value>Liên kết YouTube</value></data>
+  <data name="Chat URL" xml:space="preserve"><value>Liên kết Chat</value></data>
   <data name="Menu" xml:space="preserve"><value>Menu</value></data>
   <data name="Back to top" xml:space="preserve"><value>Lên đầu trang</value></data>
   <data name="Sidebar" xml:space="preserve"><value>Thanh bên</value></data>
   <data name="Featured" xml:space="preserve"><value>Nổi bật</value></data>
   <data name="Featured posts are highlighted on the home page." xml:space="preserve"><value>Bài nổi bật được giới thiệu ở trang chủ.</value></data>
+  <data name="Forgot your password?" xml:space="preserve"><value>Quên mật khẩu?</value></data>
+  <data name="Username or email" xml:space="preserve"><value>Tên đăng nhập hoặc email</value></data>
+  <data name="Enter your username or email. If it belongs to an administrator or editor account with an email address, we will send a link to reset the password." xml:space="preserve"><value>Nhập tên đăng nhập hoặc email. Nếu đó là tài khoản quản trị viên hoặc biên tập viên có địa chỉ email, chúng tôi sẽ gửi liên kết để đặt lại mật khẩu.</value></data>
+  <data name="Send reset link" xml:space="preserve"><value>Gửi liên kết đặt lại</value></data>
+  <data name="Back to sign in" xml:space="preserve"><value>Quay lại đăng nhập</value></data>
+  <data name="Reset your password" xml:space="preserve"><value>Đặt lại mật khẩu</value></data>
+  <data name="Reset link is invalid" xml:space="preserve"><value>Liên kết không hợp lệ</value></data>
+  <data name="This password reset link is invalid, expired or already used." xml:space="preserve"><value>Liên kết đặt lại mật khẩu không hợp lệ, đã hết hạn hoặc đã được sử dụng.</value></data>
+  <data name="Request a new link" xml:space="preserve"><value>Yêu cầu liên kết mới</value></data>
+  <data name="If the account exists and has an email address, a reset link has been sent." xml:space="preserve"><value>Nếu tài khoản tồn tại và có địa chỉ email, liên kết đặt lại mật khẩu đã được gửi.</value></data>
+  <data name="Hello" xml:space="preserve"><value>Xin chào</value></data>
+  <data name="We received a request to reset your password. Click the link below to choose a new one:" xml:space="preserve"><value>Chúng tôi nhận được yêu cầu đặt lại mật khẩu của bạn. Bấm vào liên kết dưới đây để chọn mật khẩu mới:</value></data>
+  <data name="This link is valid for {0} minutes and can be used once. If you did not request it, ignore this email." xml:space="preserve"><value>Liên kết có hiệu lực trong {0} phút và chỉ dùng được một lần. Nếu bạn không yêu cầu, hãy bỏ qua email này.</value></data>
 </root>
