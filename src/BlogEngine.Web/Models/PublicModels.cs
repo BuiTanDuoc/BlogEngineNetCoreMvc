@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Infrastructure;
 
@@ -23,6 +24,7 @@ public class PostSummary
     public string? AuthorDisplayName { get; set; }
     public bool IsCommentEnabled { get; set; }
     public bool IsFeatured { get; set; }
+    public ContentVisibility Visibility { get; set; }
     public int CommentCount { get; set; }
     public double Rating { get; set; }
     public int Raters { get; set; }
@@ -37,11 +39,42 @@ public class PostSummary
 
 public static class PostQueries
 {
-    /// <summary>Bài đã publish, chưa xoá và đã đến giờ đăng.</summary>
-    public static IQueryable<Post> Visible(this IQueryable<Post> query)
+    /// <summary>
+    /// Bài đã publish, chưa xoá, đã đến giờ đăng VÀ người xem được phép xem theo Visibility
+    /// (xem <see cref="ContentAccess"/>). Không truyền <paramref name="viewer"/> = khách (chỉ thấy bài Public) —
+    /// dùng cho RSS/sitemap. Quên truyền viewer chỉ làm ẩn bớt bài, không bao giờ làm lộ bài.
+    /// </summary>
+    public static IQueryable<Post> Visible(this IQueryable<Post> query, ClaimsPrincipal? viewer = null)
     {
         var now = DateTime.UtcNow;
-        return query.Where(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now);
+        var signedIn = viewer.IsSignedIn();
+        var userId = signedIn ? viewer!.GetUserId() : 0;
+        return query.Where(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now
+            && (p.Visibility == ContentVisibility.Public
+                || (signedIn && p.Visibility == ContentVisibility.Private)
+                || (signedIn && p.Visibility == ContentVisibility.Personal && p.AuthorId == userId)));
+    }
+
+    /// <summary>
+    /// Chuyên mục kèm số bài MÀ NGƯỜI XEM THẤY được (không đếm bài Private/Personal mà họ không có quyền xem,
+    /// tránh lộ sự tồn tại của bài qua con số). Caller tự Where(Count &gt; 0)/OrderBy/Take.
+    /// </summary>
+    public static IQueryable<CategoryCard> VisibleCategoryCards(this IQueryable<Category> query, ClaimsPrincipal? viewer = null)
+    {
+        var now = DateTime.UtcNow;
+        var signedIn = viewer.IsSignedIn();
+        var userId = signedIn ? viewer!.GetUserId() : 0;
+        return query.Select(c => new CategoryCard
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Slug = c.Slug,
+            Description = c.Description,
+            Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now
+                && (p.Visibility == ContentVisibility.Public
+                    || (signedIn && p.Visibility == ContentVisibility.Private)
+                    || (signedIn && p.Visibility == ContentVisibility.Personal && p.AuthorId == userId)))
+        });
     }
 
     public static IQueryable<PostSummary> ToSummary(this IQueryable<Post> query) =>
@@ -57,12 +90,27 @@ public static class PostQueries
             AuthorDisplayName = p.Author!.DisplayName,
             IsCommentEnabled = p.IsCommentEnabled,
             IsFeatured = p.IsFeatured,
+            Visibility = p.Visibility,
             Rating = p.Rating,
             Raters = p.Raters,
             CommentCount = p.Comments.Count(c => c.IsApproved && !c.IsSpam && !c.IsDeleted),
             Categories = p.Categories.Select(c => new NameSlug { Name = c.Name, Slug = c.Slug }).ToList(),
             Tags = p.Tags.Select(t => new NameSlug { Name = t.Name, Slug = t.Slug }).ToList()
         });
+}
+
+public static class PageQueries
+{
+    /// <summary>Trang đã publish, chưa xoá và người xem được phép xem theo Visibility. Không truyền viewer = khách.</summary>
+    public static IQueryable<Page> Visible(this IQueryable<Page> query, ClaimsPrincipal? viewer = null)
+    {
+        var signedIn = viewer.IsSignedIn();
+        var userId = signedIn ? viewer!.GetUserId() : 0;
+        return query.Where(p => p.IsPublished && !p.IsDeleted
+            && (p.Visibility == ContentVisibility.Public
+                || (signedIn && p.Visibility == ContentVisibility.Private)
+                || (signedIn && p.Visibility == ContentVisibility.Personal && p.AuthorId == userId)));
+    }
 }
 
 public class PostListViewModel
@@ -178,6 +226,7 @@ public class ResetPasswordInput
 
 public class CategoryCard
 {
+    public int Id { get; init; }
     public string Name { get; init; } = "";
     public string Slug { get; init; } = "";
     public string? Description { get; init; }

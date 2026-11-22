@@ -1,4 +1,5 @@
 using BlogEngine.Web.Data;
+using BlogEngine.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,8 @@ public class NavViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var pages = await _db.Pages.AsNoTracking()
-            .Where(p => p.IsPublished && !p.IsDeleted && p.ShowInList && p.ParentId == null && !p.IsFrontPage)
+        var pages = await _db.Pages.AsNoTracking().Visible(UserClaimsPrincipal)
+            .Where(p => p.ShowInList && p.ParentId == null && !p.IsFrontPage)
             .OrderBy(p => p.Title)
             .Select(p => new Data.Entities.Page { Title = p.Title, Slug = p.Slug })
             .ToListAsync();

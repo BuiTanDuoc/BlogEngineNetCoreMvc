@@ -105,6 +105,7 @@ public class FeedController : Controller
         return Xml(doc, "application/atom+xml");
     }
 
+    // RSS/Atom là công khai và được cache 10 phút: Visible() không truyền viewer = chỉ bài Public.
     private Task<List<Data.Entities.Post>> LoadPostsAsync(BlogSettings settings) =>
         _db.Posts.AsNoTracking().Visible()
             .Include(p => p.Author)

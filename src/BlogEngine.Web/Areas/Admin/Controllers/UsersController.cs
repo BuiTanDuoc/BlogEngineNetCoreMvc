@@ -130,7 +130,8 @@ public class UsersController : AdminControllerBase
         var user = await _db.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == id);
         if (user is null) return NotFound();
 
-        if (await _db.Posts.AnyAsync(p => p.AuthorId == id))
+        // Posts và Pages đều có khoá ngoại Restrict tới người tạo.
+        if (await _db.Posts.AnyAsync(p => p.AuthorId == id) || await _db.Pages.AnyAsync(p => p.AuthorId == id))
         {
             FlashError(L["This user has posts. Deactivate the account instead of deleting it."]);
             return RedirectToAction(nameof(Index));

@@ -196,6 +196,12 @@ input:not([type]), input[type=text], input[type=email], input[type=password], in
 .alert-success { background: var(--success-bg); color: var(--success-text); }
 .alert-warning { background: var(--warn-bg); color: var(--warn-text); }
 .alert-danger { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+.alert-info { background: var(--accent-soft); color: var(--text); }
+:root[data-theme="dark"] .alert-info { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+
+/* Nhãn phạm vi xem cho bài Private/Personal (danh sách bài) */
+.card .label-vis, .vis-badge { color: var(--accent); background: var(--accent-soft); padding: .28rem .5rem; border-radius: 999px; font: 600 .7rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.vis-chip { background: var(--accent); }
 
 .archive-group ul { padding-left: 1.2rem; }
 

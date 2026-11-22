@@ -1,5 +1,21 @@
 namespace BlogEngine.Web.Data.Entities;
 
+/// <summary>
+/// Phạm vi xem của bài viết / trang (độc lập với trạng thái xuất bản IsPublished).
+/// Giá trị được lưu dạng số trong DB — KHÔNG đổi số thứ tự các giá trị đã có.
+/// </summary>
+public enum ContentVisibility
+{
+    /// <summary>Công khai: ai cũng xem được (kể cả khách chưa đăng nhập, RSS, sitemap).</summary>
+    Public = 0,
+
+    /// <summary>Riêng tư: chỉ người dùng đã đăng nhập mới xem được.</summary>
+    Private = 1,
+
+    /// <summary>Cá nhân: chỉ chính người viết mới xem được (kể cả Administrators cũng không).</summary>
+    Personal = 2
+}
+
 public class Post
 {
     public int Id { get; set; }
@@ -17,6 +33,10 @@ public class Post
     public User? Author { get; set; }
 
     public bool IsPublished { get; set; }
+
+    /// <summary>Ai được xem bài này (Public / Private / Personal). Mặc định Public.</summary>
+    public ContentVisibility Visibility { get; set; } = ContentVisibility.Public;
+
     public bool IsCommentEnabled { get; set; } = true;
 
     /// <summary>Bài nổi bật: được ghim ở mục "Featured" trên trang chủ.</summary>
@@ -46,6 +66,17 @@ public class Page
     public DateTime DateModified { get; set; } = DateTime.UtcNow;
 
     public bool IsPublished { get; set; }
+
+    /// <summary>Ai được xem trang này (Public / Private / Personal). Mặc định Public.</summary>
+    public ContentVisibility Visibility { get; set; } = ContentVisibility.Public;
+
+    /// <summary>
+    /// Người tạo trang. Cần cho Visibility = Personal. Trang có sẵn từ trước khi có tính năng này
+    /// là null (và luôn Public); được gán khi người dùng chuyển trang sang Personal.
+    /// </summary>
+    public int? AuthorId { get; set; }
+    public User? Author { get; set; }
+
     public bool IsFrontPage { get; set; }
     public bool ShowInList { get; set; } = true;
     public bool IsDeleted { get; set; }

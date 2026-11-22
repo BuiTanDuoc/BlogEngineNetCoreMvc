@@ -12,9 +12,16 @@ public class CommentsController : AdminControllerBase
     private readonly BlogDbContext _db;
     public CommentsController(BlogDbContext db) => _db = db;
 
+    /// <summary>Comment trên bài Personal của người khác không được thấy/duyệt (kể cả Administrators).</summary>
+    private IQueryable<Data.Entities.Comment> AccessibleComments()
+    {
+        var uid = User.GetUserId();
+        return _db.Comments.Where(c => c.Post!.Visibility != Data.Entities.ContentVisibility.Personal || c.Post.AuthorId == uid);
+    }
+
     public async Task<IActionResult> Index(string filter = "pending", int page = 1)
     {
-        var all = _db.Comments.AsNoTracking();
+        var all = AccessibleComments().AsNoTracking();
         var query = filter switch
         {
             "approved" => all.Where(c => c.IsApproved && !c.IsSpam && !c.IsDeleted),
@@ -49,7 +56,7 @@ public class CommentsController : AdminControllerBase
 
     private async Task<IActionResult> Update(int id, string filter, Action<Data.Entities.Comment> change)
     {
-        var comment = await _db.Comments.FirstOrDefaultAsync(c => c.Id == id);
+        var comment = await AccessibleComments().FirstOrDefaultAsync(c => c.Id == id);
         if (comment is null) return NotFound();
 
         change(comment);

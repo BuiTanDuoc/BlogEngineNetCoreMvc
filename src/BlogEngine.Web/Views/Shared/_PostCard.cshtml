@@ -4,6 +4,13 @@
     var settings = await SettingsService.GetAsync();
     var summary = string.IsNullOrWhiteSpace(Model.Description) ? Model.Content.Excerpt(170) : Model.Description.Excerpt(200);
     var first = Model.Categories.FirstOrDefault();
+    // Bài không công khai: hiện nhãn để người viết/người đã đăng nhập biết bài này không phải ai cũng thấy.
+    var visLabel = Model.Visibility switch
+    {
+        ContentVisibility.Private => "🔒 " + L["Private"].Value,
+        ContentVisibility.Personal => "👤 " + L["Personal"].Value,
+        _ => null
+    };
 }
 @if (settings.IsBlk)
 {
@@ -14,9 +21,10 @@
             <a class="bk-card-thumb" tabindex="-1" aria-hidden="true" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug"><img src="@bkImg" alt="" loading="lazy" /></a>
         }
         <div class="bk-card-body">
-            @if (Model.IsFeatured || first is not null)
+            @if (Model.IsFeatured || first is not null || visLabel is not null)
             {
                 <div class="bk-card-labels">
+                    @if (visLabel is not null) { <span class="bk-chip vis-chip">@visLabel</span> }
                     @if (Model.IsFeatured) { <span class="bk-chip bk-chip-warm">★ @L["Featured"]</span> }
                     @if (first is not null) { <a class="bk-chip" asp-controller="Categories" asp-action="Details" asp-route-slug="@first.Slug">@first.Name</a> }
                 </div>
@@ -53,6 +61,11 @@ else if (settings.IsIndigo)
                 <span>@L["by"] @Model.AuthorName</span>
                 <span class="ix-sl">/</span>
                 <time datetime="@Model.DateCreated.ToString("o")">@when.ToString(L["MMM d, yyyy"].Value)</time>
+                @if (visLabel is not null)
+                {
+                    <span class="ix-sl">/</span>
+                    <span class="vis-badge">@visLabel</span>
+                }
                 @if (Model.Categories.Count > 0)
                 {
                     <span class="ix-sl">/</span>
@@ -76,9 +89,10 @@ else
     {
         <a class="card-thumb" tabindex="-1" aria-hidden="true" asp-controller="Posts" asp-action="Details" asp-route-slug="@Model.Slug"><img src="@thumb" alt="" loading="lazy" /></a>
     }
-    @if (Model.IsFeatured || first is not null)
+    @if (Model.IsFeatured || first is not null || visLabel is not null)
     {
         <div class="card-labels">
+            @if (visLabel is not null) { <span class="label label-vis">@visLabel</span> }
             @if (Model.IsFeatured) { <span class="label label-featured">★ @L["Featured"]</span> }
             @if (first is not null) { <span class="label">@first.Name</span> }
         </div>

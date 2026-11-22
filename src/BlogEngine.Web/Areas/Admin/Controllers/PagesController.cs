@@ -13,10 +13,20 @@ public class PagesController : AdminControllerBase
     private readonly BlogDbContext _db;
     public PagesController(BlogDbContext db) => _db = db;
 
+    /// <summary>
+    /// Các trang người dùng hiện tại được phép thấy/sửa: mọi trang TRỪ trang Personal của người khác
+    /// (Personal = chỉ người tạo mới thấy, kể cả admin). Mọi truy vấn theo id phải đi qua đây để trả 404 thay vì lộ trang.
+    /// </summary>
+    private IQueryable<Page> Accessible()
+    {
+        var uid = User.GetUserId();
+        return _db.Pages.Where(p => p.Visibility != ContentVisibility.Personal || p.AuthorId == uid);
+    }
+
     public async Task<IActionResult> Index(bool trash = false)
     {
         ViewBag.Trash = trash;
-        var pages = await _db.Pages.AsNoTracking()
+        var pages = await Accessible().AsNoTracking()
             .Include(p => p.Parent)
             .Where(p => p.IsDeleted == trash)
             .OrderBy(p => p.Title)
@@ -40,7 +50,7 @@ public class PagesController : AdminControllerBase
             return View("Edit", model);
         }
 
-        var page = new Page();
+        var page = new Page { AuthorId = User.GetUserId() };
         await ApplyAsync(page, model);
         _db.Pages.Add(page);
         await _db.SaveChangesAsync();
@@ -51,7 +61,7 @@ public class PagesController : AdminControllerBase
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var page = await _db.Pages.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+        var page = await Accessible().AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         if (page is null) return NotFound();
 
         await LoadParentsAsync(id);
@@ -60,7 +70,7 @@ public class PagesController : AdminControllerBase
         return View(new PageEditModel
         {
             Id = page.Id, Title = page.Title, Slug = page.Slug, Description = page.Description,
-            Content = page.Content, Keywords = page.Keywords, IsPublished = page.IsPublished,
+            Content = page.Content, Keywords = page.Keywords, IsPublished = page.IsPublished, Visibility = page.Visibility,
             IsFrontPage = page.IsFrontPage, ShowInList = page.ShowInList, ParentId = page.ParentId
         });
     }
@@ -68,7 +78,7 @@ public class PagesController : AdminControllerBase
     [HttpPost]
     public async Task<IActionResult> Edit(int id, PageEditModel model)
     {
-        var page = await _db.Pages.FirstOrDefaultAsync(p => p.Id == id);
+        var page = await Accessible().FirstOrDefaultAsync(p => p.Id == id);
         if (page is null) return NotFound();
 
         if (!await ValidateAsync(model, id))
@@ -89,7 +99,7 @@ public class PagesController : AdminControllerBase
     [HttpPost]
     public async Task<IActionResult> Trash(int id)
     {
-        var page = await _db.Pages.FirstOrDefaultAsync(p => p.Id == id);
+        var page = await Accessible().FirstOrDefaultAsync(p => p.Id == id);
         if (page is null) return NotFound();
         page.IsDeleted = true;
         page.IsFrontPage = false;
@@ -101,7 +111,7 @@ public class PagesController : AdminControllerBase
     [HttpPost]
     public async Task<IActionResult> Restore(int id)
     {
-        var page = await _db.Pages.FirstOrDefaultAsync(p => p.Id == id);
+        var page = await Accessible().FirstOrDefaultAsync(p => p.Id == id);
         if (page is null) return NotFound();
         page.IsDeleted = false;
         await _db.SaveChangesAsync();
@@ -112,7 +122,7 @@ public class PagesController : AdminControllerBase
     [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {
-        var page = await _db.Pages.Include(p => p.Children).FirstOrDefaultAsync(p => p.Id == id);
+        var page = await Accessible().Include(p => p.Children).FirstOrDefaultAsync(p => p.Id == id);
         if (page is null) return NotFound();
         if (!page.IsDeleted) { FlashError(L["Move the page to trash first."]); return RedirectToAction(nameof(Index)); }
 
@@ -125,7 +135,7 @@ public class PagesController : AdminControllerBase
 
     private async Task LoadParentsAsync(int? excludeId)
     {
-        ViewBag.Parents = await _db.Pages.AsNoTracking()
+        ViewBag.Parents = await Accessible().AsNoTracking()
             .Where(p => !p.IsDeleted && p.Id != (excludeId ?? 0))
             .OrderBy(p => p.Title).ToListAsync();
     }
@@ -147,6 +157,19 @@ public class PagesController : AdminControllerBase
                 cursor = await _db.Pages.AsNoTracking().Where(p => p.Id == c).Select(p => p.ParentId).FirstOrDefaultAsync();
             }
         }
+
+        // Trang chủ (front page) thay thế trang chủ của cả blog nên phải công khai.
+        if (model.IsFrontPage && model.Visibility != ContentVisibility.Public)
+            ModelState.AddModelError(nameof(model.Visibility), L["The front page must be public."]);
+
+        // Chỉ người tạo mới được đặt trang là Personal (trang cũ chưa có người tạo thì người đặt sẽ trở thành chủ).
+        if (id is int pageId && model.Visibility == ContentVisibility.Personal)
+        {
+            var owner = await _db.Pages.AsNoTracking().Where(p => p.Id == pageId).Select(p => p.AuthorId).FirstOrDefaultAsync();
+            if (owner is int ownerId && ownerId != User.GetUserId())
+                ModelState.AddModelError(nameof(model.Visibility), L["Only the author can make a page personal."]);
+        }
+
         return ModelState.IsValid;
     }
 
@@ -158,6 +181,10 @@ public class PagesController : AdminControllerBase
         page.Content = model.Content;
         page.Keywords = model.Keywords.NullIfEmpty();
         page.IsPublished = model.IsPublished;
+        page.Visibility = model.Visibility;
+        // Trang cũ chưa có người tạo: người đặt nó thành Personal trở thành chủ (nếu không sẽ không ai xem được).
+        if (page.Visibility == ContentVisibility.Personal && page.AuthorId is null)
+            page.AuthorId = User.GetUserId();
         page.ShowInList = model.ShowInList;
         page.ParentId = model.ParentId;
         page.DateModified = DateTime.UtcNow;

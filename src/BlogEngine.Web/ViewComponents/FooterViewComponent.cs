@@ -13,21 +13,14 @@ public class FooterViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var now = DateTime.UtcNow;
-
         var categories = await _db.Categories.AsNoTracking()
-            .Select(c => new CategoryCard
-            {
-                Name = c.Name,
-                Slug = c.Slug,
-                Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
-            })
+            .VisibleCategoryCards(UserClaimsPrincipal)
             .Where(c => c.Count > 0)
             .OrderByDescending(c => c.Count)
             .Take(8)
             .ToListAsync();
 
-        var recent = await _db.Posts.AsNoTracking().Visible()
+        var recent = await _db.Posts.AsNoTracking().Visible(UserClaimsPrincipal)
             .OrderByDescending(p => p.DateCreated)
             .Take(5)
             .Select(p => new { p.Title, p.Slug })

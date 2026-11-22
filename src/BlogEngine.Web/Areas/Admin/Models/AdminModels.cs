@@ -44,6 +44,9 @@ public class PostEditModel
     [Display(Name = "Published")]
     public bool IsPublished { get; set; }
 
+    [Display(Name = "Visibility")]
+    public ContentVisibility Visibility { get; set; } = ContentVisibility.Public;
+
     [Display(Name = "Allow comments")]
     public bool IsCommentEnabled { get; set; } = true;
 
@@ -88,6 +91,7 @@ public class PageEditModel
     public string? Keywords { get; set; }
 
     [Display(Name = "Published")] public bool IsPublished { get; set; }
+    [Display(Name = "Visibility")] public ContentVisibility Visibility { get; set; } = ContentVisibility.Public;
     [Display(Name = "Use as front page")] public bool IsFrontPage { get; set; }
     [Display(Name = "Show in menu")] public bool ShowInList { get; set; } = true;
     [Display(Name = "Parent page")] public int? ParentId { get; set; }

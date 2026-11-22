@@ -17,10 +17,23 @@ public class PagesController : LocalizedController
     public async Task<IActionResult> Details(string slug)
     {
         var page = await _db.Pages.AsNoTracking().FirstOrDefaultAsync(p => p.Slug == slug && !p.IsDeleted);
-        if (page is null || (!page.IsPublished && !User.IsStaff())) return NotFound();
+        if (page is null) return NotFound();
 
-        ViewBag.Children = await _db.Pages.AsNoTracking()
-            .Where(p => p.ParentId == page.Id && p.IsPublished && !p.IsDeleted && p.ShowInList)
+        // Trang nháp chỉ staff xem trước được (như cũ).
+        if (!page.IsPublished && !User.IsStaff()) return NotFound();
+
+        // Quyền xem theo Visibility: khách -> trang đăng nhập; đã đăng nhập mà không có quyền -> 404.
+        if (!User.CanView(page.Visibility, page.AuthorId))
+        {
+            if (!User.IsSignedIn()) return Challenge();
+            return NotFound();
+        }
+
+        if (page.Visibility != ContentVisibility.Public)
+            Response.Headers.CacheControl = "private, no-store";
+
+        ViewBag.Children = await _db.Pages.AsNoTracking().Visible(User)
+            .Where(p => p.ParentId == page.Id && p.ShowInList)
             .OrderBy(p => p.Title)
             .ToListAsync();
 
@@ -48,7 +61,7 @@ public class CategoriesController : LocalizedController
         if (category is null) return NotFound();
 
         var settings = await _settings.GetAsync();
-        var query = _db.Posts.AsNoTracking().Visible()
+        var query = _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.Categories.Any(c => c.Id == category.Id))
             .OrderByDescending(p => p.DateCreated)
             .ToSummary();
@@ -82,7 +95,7 @@ public class TagsController : LocalizedController
         if (tag is null) return NotFound();
 
         var settings = await _settings.GetAsync();
-        var query = _db.Posts.AsNoTracking().Visible()
+        var query = _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.Tags.Any(t => t.Id == tag.Id))
             .OrderByDescending(p => p.DateCreated)
             .ToSummary();
@@ -114,7 +127,7 @@ public class AuthorController : LocalizedController
         if (author is null) return NotFound();
 
         var settings = await _settings.GetAsync();
-        var query = _db.Posts.AsNoTracking().Visible()
+        var query = _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.AuthorId == author.Id)
             .OrderByDescending(p => p.DateCreated)
             .ToSummary();
@@ -144,7 +157,7 @@ public class ArchiveController : LocalizedController
     public async Task<IActionResult> Index()
     {
         var settings = await _settings.GetAsync();
-        var entries = await _db.Posts.AsNoTracking().Visible()
+        var entries = await _db.Posts.AsNoTracking().Visible(User)
             .OrderByDescending(p => p.DateCreated)
             .Select(p => new ArchiveViewModel.Entry
             {
@@ -186,7 +199,7 @@ public class ArchiveController : LocalizedController
 
     private async Task<IActionResult> ListRangeAsync(DateTime start, DateTime end, string heading, int page, BlogSettings settings)
     {
-        var query = _db.Posts.AsNoTracking().Visible()
+        var query = _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.DateCreated >= start && p.DateCreated < end)
             .OrderByDescending(p => p.DateCreated)
             .ToSummary();
@@ -228,7 +241,7 @@ public class SearchController : LocalizedController
             });
         }
 
-        var query = _db.Posts.AsNoTracking().Visible()
+        var query = _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.Title.Contains(term)
                         || (p.Description != null && p.Description.Contains(term))
                         || p.Content.Contains(term)

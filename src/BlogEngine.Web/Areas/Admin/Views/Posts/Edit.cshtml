@@ -38,6 +38,15 @@
         <div class="panel">
             <h2>@L["Publish"]</h2>
             <div class="field"><label class="inline"><input asp-for="IsPublished" /> @L["Published"]</label></div>
+            <div class="field">
+                <label for="Visibility">@L["Visibility"]</label>
+                <select name="Visibility" id="Visibility">
+                    <option value="@((int)ContentVisibility.Public)" selected="@(Model.Visibility == ContentVisibility.Public)">@L["Public — everyone can see it"]</option>
+                    <option value="@((int)ContentVisibility.Private)" selected="@(Model.Visibility == ContentVisibility.Private)">@L["Private — signed-in users only"]</option>
+                    <option value="@((int)ContentVisibility.Personal)" selected="@(Model.Visibility == ContentVisibility.Personal)">@L["Personal — only the author"]</option>
+                </select>
+                <span class="muted small">@L["Who is allowed to read this post once it is published."]</span>
+            </div>
             <div class="field"><label class="inline"><input asp-for="IsCommentEnabled" /> @L["Allow comments"]</label></div>
             <div class="field">
                 <label class="inline"><input asp-for="IsFeatured" /> @L["Featured"]</label>

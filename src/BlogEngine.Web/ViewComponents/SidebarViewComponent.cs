@@ -1,4 +1,5 @@
 using BlogEngine.Web.Data;
+using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Infrastructure;
 using BlogEngine.Web.Models;
 using BlogEngine.Web.Services;
@@ -23,18 +24,17 @@ public class SidebarViewComponent : ViewComponent
     {
         var settings = await _settings.GetAsync();
         var now = DateTime.UtcNow;
+        var viewer = UserClaimsPrincipal;
+        var signedIn = viewer.IsSignedIn();
+        var userId = signedIn ? viewer.GetUserId() : 0;
 
         var categoryRows = await _db.Categories.AsNoTracking()
-            .Select(c => new
-            {
-                Category = c,
-                Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
-            })
-            .Where(x => x.Count > 0)
-            .OrderBy(x => x.Category.Name)
+            .VisibleCategoryCards(viewer)
+            .Where(c => c.Count > 0)
+            .OrderBy(c => c.Name)
             .ToListAsync();
 
-        var recentPosts = await _db.Posts.AsNoTracking().Visible()
+        var recentPosts = await _db.Posts.AsNoTracking().Visible(viewer)
             .OrderByDescending(p => p.DateCreated)
             .Take(settings.NumberOfRecentPosts)
             .Select(p => new { p.Title, p.Slug })
@@ -42,7 +42,10 @@ public class SidebarViewComponent : ViewComponent
 
         var recentComments = await _db.Comments.AsNoTracking()
             .Where(c => c.IsApproved && !c.IsSpam && !c.IsDeleted
-                        && c.Post!.IsPublished && !c.Post.IsDeleted && c.Post.DateCreated <= now)
+                        && c.Post!.IsPublished && !c.Post.IsDeleted && c.Post.DateCreated <= now
+                        && (c.Post.Visibility == ContentVisibility.Public
+                            || (signedIn && c.Post.Visibility == ContentVisibility.Private)
+                            || (signedIn && c.Post.Visibility == ContentVisibility.Personal && c.Post.AuthorId == userId)))
             .OrderByDescending(c => c.Date)
             .Take(settings.NumberOfRecentComments)
             .Select(c => new { c.Id, c.Author, c.Content, PostTitle = c.Post!.Title, PostSlug = c.Post.Slug })
@@ -53,14 +56,17 @@ public class SidebarViewComponent : ViewComponent
             {
                 t.Name,
                 t.Slug,
-                Count = t.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
+                Count = t.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now
+                    && (p.Visibility == ContentVisibility.Public
+                        || (signedIn && p.Visibility == ContentVisibility.Private)
+                        || (signedIn && p.Visibility == ContentVisibility.Personal && p.AuthorId == userId)))
             })
             .Where(x => x.Count > 0)
             .OrderByDescending(x => x.Count)
             .Take(30)
             .ToListAsync();
 
-        var dates = await _db.Posts.AsNoTracking().Visible()
+        var dates = await _db.Posts.AsNoTracking().Visible(viewer)
             .Select(p => p.DateCreated)
             .ToListAsync();
         var months = dates
@@ -75,8 +81,8 @@ public class SidebarViewComponent : ViewComponent
 
         var vm = new SidebarViewModel
         {
-            Categories = categoryRows.Select(x => x.Category).ToList(),
-            CategoryCounts = categoryRows.ToDictionary(x => x.Category.Id, x => x.Count),
+            Categories = categoryRows.Select(c => new Category { Id = c.Id, Name = c.Name, Slug = c.Slug }).ToList(),
+            CategoryCounts = categoryRows.ToDictionary(c => c.Id, c => c.Count),
             RecentPosts = recentPosts.Select(p => (p.Title, p.Slug)).ToList(),
             RecentComments = recentComments
                 .Select(c => (c.Author, c.PostTitle, c.PostSlug, c.Id, c.Content.Excerpt(60)))

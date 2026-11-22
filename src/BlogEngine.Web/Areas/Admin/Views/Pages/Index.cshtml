@@ -18,7 +18,9 @@
     @foreach (var p in Model)
     {
         <tr>
-            <td><a href="/admin/pages/edit/@p.Id"><strong>@p.Title</strong></a>@if (p.IsFrontPage) { <span class="status"> @L["front page"]</span> }</td>
+            <td><a href="/admin/pages/edit/@p.Id"><strong>@p.Title</strong></a>@if (p.IsFrontPage) { <span class="status"> @L["front page"]</span> }
+                @if (p.Visibility == ContentVisibility.Private) { <span class="status status-private" title="@L["Only signed-in users can see this."]">🔒 @L["Private"]</span> }
+                else if (p.Visibility == ContentVisibility.Personal) { <span class="status status-personal" title="@L["Only the author can see this."]">👤 @L["Personal"]</span> }</td>
             <td>@p.Parent?.Title</td>
             <td>@if (p.IsPublished) { <span class="status status-published">@L["Published"].Value.ToLower()</span> } else { <span class="status status-draft">@L["draft"]</span> }</td>
             <td>

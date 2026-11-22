@@ -69,7 +69,7 @@ public class PostsController : AdminControllerBase
         var post = await _db.Posts.AsNoTracking()
             .Include(p => p.Categories).Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Id == id);
-        if (post is null) return NotFound();
+        if (post is null || IsHiddenPersonal(post)) return NotFound();
         if (!CanModify(post)) return Forbid();
 
         var settings = await _settings.GetAsync();
@@ -87,6 +87,7 @@ public class PostsController : AdminControllerBase
             CategoryIds = post.Categories.Select(c => c.Id).ToList(),
             Tags = string.Join(", ", post.Tags.Select(t => t.Name)),
             IsPublished = post.IsPublished,
+            Visibility = post.Visibility,
             IsCommentEnabled = post.IsCommentEnabled,
             IsFeatured = post.IsFeatured,
             DateCreated = post.DateCreated.ToBlogTime(settings)
@@ -97,8 +98,12 @@ public class PostsController : AdminControllerBase
     public async Task<IActionResult> Edit(int id, PostEditModel model)
     {
         var post = await _db.Posts.Include(p => p.Categories).Include(p => p.Tags).FirstOrDefaultAsync(p => p.Id == id);
-        if (post is null) return NotFound();
+        if (post is null || IsHiddenPersonal(post)) return NotFound();
         if (!CanModify(post)) return Forbid();
+
+        // Administrator sửa bài của người khác thì không được biến nó thành Personal (sẽ làm bài biến mất với mọi người trừ tác giả).
+        if (model.Visibility == ContentVisibility.Personal && post.AuthorId != User.GetUserId())
+            ModelState.AddModelError(nameof(model.Visibility), L["Only the author can make a post personal."]);
 
         if (!ModelState.IsValid)
         {
@@ -121,7 +126,7 @@ public class PostsController : AdminControllerBase
     public async Task<IActionResult> Trash(int id)
     {
         var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
-        if (post is null) return NotFound();
+        if (post is null || IsHiddenPersonal(post)) return NotFound();
         if (!CanModify(post)) return Forbid();
 
         post.IsDeleted = true;
@@ -135,7 +140,7 @@ public class PostsController : AdminControllerBase
     public async Task<IActionResult> Restore(int id)
     {
         var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
-        if (post is null) return NotFound();
+        if (post is null || IsHiddenPersonal(post)) return NotFound();
         if (!CanModify(post)) return Forbid();
 
         post.IsDeleted = false;
@@ -150,7 +155,7 @@ public class PostsController : AdminControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var post = await _db.Posts.Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == id);
-        if (post is null) return NotFound();
+        if (post is null || IsHiddenPersonal(post)) return NotFound();
         if (!CanModify(post)) return Forbid();
         if (!post.IsDeleted)
         {
@@ -173,13 +178,12 @@ public class PostsController : AdminControllerBase
     private IQueryable<Post> OwnPosts()
     {
         var query = _db.Posts.AsNoTracking();
-        // Editors chỉ thấy bài của mình; Administrators thấy tất cả.
-        if (!User.IsAdministrator())
-        {
-            var uid = User.GetUserId();
-            query = query.Where(p => p.AuthorId == uid);
-        }
-        return query;
+        var uid = User.GetUserId();
+        // Editors chỉ thấy bài của mình; Administrators thấy tất cả TRỪ bài Personal của người khác
+        // (Personal = chỉ người viết mới thấy, kể cả admin).
+        return User.IsAdministrator()
+            ? query.Where(p => p.Visibility != ContentVisibility.Personal || p.AuthorId == uid)
+            : query.Where(p => p.AuthorId == uid);
     }
 
     private static IQueryable<Post> Filter(IQueryable<Post> query, string status, string? q)
@@ -201,6 +205,10 @@ public class PostsController : AdminControllerBase
 
     private bool CanModify(Post post) => User.IsAdministrator() || post.AuthorId == User.GetUserId();
 
+    /// <summary>Bài Personal của người khác: coi như không tồn tại (404) để không lộ cả sự tồn tại lẫn tiêu đề.</summary>
+    private bool IsHiddenPersonal(Post post) =>
+        post.Visibility == ContentVisibility.Personal && post.AuthorId != User.GetUserId();
+
     private async Task LoadLookupsAsync()
     {
         ViewBag.Categories = await _db.Categories.AsNoTracking().OrderBy(c => c.Name).ToListAsync();
@@ -217,6 +225,7 @@ public class PostsController : AdminControllerBase
         post.Description = model.Description.NullIfEmpty();
         post.Content = model.Content;
         post.IsPublished = model.IsPublished;
+        post.Visibility = model.Visibility;
         post.IsCommentEnabled = model.IsCommentEnabled;
         post.IsFeatured = model.IsFeatured;
         post.DateModified = now;

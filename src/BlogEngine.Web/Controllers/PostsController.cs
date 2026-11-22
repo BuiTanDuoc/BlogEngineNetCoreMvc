@@ -25,8 +25,8 @@ public class PostsController : LocalizedController
     [HttpGet("post/{slug}")]
     public async Task<IActionResult> Details(string slug)
     {
-        var post = await LoadPostAsync(slug);
-        if (post is null) return NotFound();
+        var (post, denied) = await ResolvePostAsync(slug, challengeAnonymous: true);
+        if (post is null) return denied!;
 
         return View(await BuildViewModelAsync(post, new CommentInput()));
     }
@@ -35,8 +35,9 @@ public class PostsController : LocalizedController
     [EnableRateLimiting("forms")]
     public async Task<IActionResult> Comment(string slug, CommentInput input)
     {
-        var post = await LoadPostAsync(slug);
-        if (post is null) return NotFound();
+        // POST không "challenge" sang trang đăng nhập (ReturnUrl sẽ trỏ vào URL POST): người không xem được bài thì cũng không có form để gửi.
+        var (post, denied) = await ResolvePostAsync(slug, challengeAnonymous: false);
+        if (post is null) return denied!;
 
         var settings = await _settings.GetAsync();
         if (!CanComment(post, settings)) return BadRequest(L["Comments are closed for this post."].Value);
@@ -73,7 +74,9 @@ public class PostsController : LocalizedController
         _db.Comments.Add(comment);
         await _db.SaveChangesAsync();
 
-        if (settings.SendMailOnComment && !string.IsNullOrWhiteSpace(settings.Email))
+        // Bài Personal chỉ người viết được biết: không gửi nội dung/tiêu đề ra email của blog.
+        if (settings.SendMailOnComment && !string.IsNullOrWhiteSpace(settings.Email)
+            && post.Visibility != ContentVisibility.Personal)
         {
             var link = $"{Request.Scheme}://{Request.Host}/post/{post.Slug}#id_{comment.Id}";
             var body = $"<p>New comment by <b>{System.Net.WebUtility.HtmlEncode(comment.Author)}</b> " +
@@ -97,8 +100,8 @@ public class PostsController : LocalizedController
         var settings = await _settings.GetAsync();
         if (!settings.EnableRating || rating is < 1 or > 5) return RedirectToPost(slug);
 
-        var now = DateTime.UtcNow;
-        var post = await _db.Posts.FirstOrDefaultAsync(p => p.Slug == slug && p.IsPublished && !p.IsDeleted && p.DateCreated <= now);
+        // Visible(User): không chấm điểm được bài mà mình không có quyền xem (Private/Personal).
+        var post = await _db.Posts.Visible(User).FirstOrDefaultAsync(p => p.Slug == slug);
         if (post is null) return NotFound();
 
         var cookieName = $"rated-{post.Id}";
@@ -122,7 +125,15 @@ public class PostsController : LocalizedController
 
     private IActionResult RedirectToPost(string slug) => Redirect(Url.Action(nameof(Details), new { slug })!);
 
-    private async Task<Post?> LoadPostAsync(string slug)
+    /// <summary>
+    /// Tìm bài theo slug và kiểm tra quyền xem. Trả về (bài, null) nếu được xem, hoặc (null, kết quả từ chối).
+    /// <list type="bullet">
+    ///   <item>Không có / đã xoá / nháp hoặc hẹn giờ mà người xem không phải staff → 404 (như cũ).</item>
+    ///   <item>Không đủ quyền theo Visibility: khách → chuyển tới trang đăng nhập (nếu cho phép), người đã đăng nhập → 404
+    ///   (không để lộ là bài Personal có tồn tại).</item>
+    /// </list>
+    /// </summary>
+    private async Task<(Post? Post, IActionResult? Denied)> ResolvePostAsync(string slug, bool challengeAnonymous)
     {
         var post = await _db.Posts.AsNoTracking()
             .Include(p => p.Author)
@@ -130,11 +141,23 @@ public class PostsController : LocalizedController
             .Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Slug == slug && !p.IsDeleted);
 
-        if (post is null) return null;
+        if (post is null) return (null, NotFound());
 
-        var visible = post.IsPublished && post.DateCreated <= DateTime.UtcNow;
         // Bài nháp/hẹn giờ chỉ xem trước được khi đã đăng nhập vai trò quản trị/biên tập.
-        return visible || User.IsStaff() ? post : null;
+        var live = post.IsPublished && post.DateCreated <= DateTime.UtcNow;
+        if (!live && !User.IsStaff()) return (null, NotFound());
+
+        if (!User.CanView(post.Visibility, post.AuthorId))
+        {
+            if (!User.IsSignedIn() && challengeAnonymous) return (null, Challenge());
+            return (null, NotFound());
+        }
+
+        // Bài không công khai: cấm proxy/CDN/trình duyệt dùng chung lưu lại bản sao.
+        if (post.Visibility != ContentVisibility.Public)
+            Response.Headers.CacheControl = "private, no-store";
+
+        return (post, null);
     }
 
     private static bool CanComment(Post post, BlogSettings settings) =>
@@ -161,13 +184,13 @@ public class PostsController : LocalizedController
                 roots.Add(nodes[c.Id]);
         }
 
-        var previous = await _db.Posts.AsNoTracking().Visible()
+        var previous = await _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.DateCreated < post.DateCreated)
             .OrderByDescending(p => p.DateCreated)
             .Select(p => new Post { Id = p.Id, Title = p.Title, Slug = p.Slug })
             .FirstOrDefaultAsync();
 
-        var next = await _db.Posts.AsNoTracking().Visible()
+        var next = await _db.Posts.AsNoTracking().Visible(User)
             .Where(p => p.DateCreated > post.DateCreated)
             .OrderBy(p => p.DateCreated)
             .Select(p => new Post { Id = p.Id, Title = p.Title, Slug = p.Slug })
@@ -178,7 +201,7 @@ public class PostsController : LocalizedController
         {
             var tagIds = post.Tags.Select(t => t.Id).ToList();
             var categoryIds = post.Categories.Select(c => c.Id).ToList();
-            related = await _db.Posts.AsNoTracking().Visible()
+            related = await _db.Posts.AsNoTracking().Visible(User)
                 .Where(p => p.Id != post.Id &&
                             (p.Tags.Any(t => tagIds.Contains(t.Id)) || p.Categories.Any(c => categoryIds.Contains(c.Id))))
                 .OrderByDescending(p => p.DateCreated)

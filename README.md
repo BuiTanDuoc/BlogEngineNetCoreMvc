@@ -52,6 +52,34 @@ chạy trên bản sao; mặc định kết thúc bằng `ROLLBACK` để bạn 
 - Mật khẩu cũ (SHA-256 không salt) vẫn đăng nhập được và tự nâng cấp lên PBKDF2 ở lần đăng nhập đầu.
 - Link cũ được giữ: `/post/ten-bai.aspx`, `/page/x.aspx`, `/default.aspx`, `/syndication.axd` → redirect 301 sang URL mới.
 
+## Phạm vi xem của bài viết / trang (Visibility)
+
+Mỗi bài viết và mỗi trang có thêm trường **Visibility** (Admin → Posts/Pages → ô "Visibility" ở khung Publish):
+
+| Giá trị | Ai xem được |
+|---|---|
+| `Public` (mặc định) | Mọi người, kể cả khách chưa đăng nhập; có trong RSS/Atom và sitemap |
+| `Private` | Mọi người dùng **đã đăng nhập** (kể cả tài khoản không có role) |
+| `Personal` | **Chỉ người viết** — Administrators cũng không xem/sửa được bài của người khác |
+
+Quy tắc:
+
+- Visibility chỉ trả lời "ai được xem"; việc bài đã xuất bản/hẹn giờ/nháp vẫn do `IsPublished` + ngày đăng quyết định.
+- Khách mở bài/trang Private hoặc Personal sẽ được chuyển tới trang đăng nhập rồi quay lại đúng URL; người đã đăng nhập nhưng
+  không có quyền nhận 404 (không lộ là bài Personal có tồn tại).
+- Bài/trang không Public bị ẩn khỏi danh sách (trang chủ, chuyên mục, tag, tác giả, lưu trữ, tìm kiếm), sidebar, footer, menu trang,
+  RSS/Atom, sitemap, "bài liên quan"/bài trước-sau, bộ đếm số bài của chuyên mục/tag và "comment mới nhất" — với những người không có quyền xem.
+- Trang front page bắt buộc `Public`. Trang tạo trước khi có tính năng này chưa có `AuthorId` (luôn `Public`); người đầu tiên đặt nó thành
+  `Personal` sẽ trở thành chủ trang.
+- Quy tắc nằm ở **một chỗ**: `Infrastructure/ContentAccess.cs` (kiểm tra một bài) và `PostQueries.Visible` / `PageQueries.Visible`
+  / `PostQueries.VisibleCategoryCards` trong `Models/PublicModels.cs` (lọc truy vấn). Khi thêm truy vấn bài viết mới, luôn dùng
+  `.Visible(User)`; không truyền viewer = chỉ bài Public (an toàn khi quên).
+- Lưu ý: file tải lên (`wwwroot/uploads`) vẫn truy cập được bằng URL trực tiếp, nên ảnh/tệp nhúng trong bài Private/Personal
+  không được bảo vệ bởi tính năng này.
+
+Cập nhật database: `dotnet ef database update` (hoặc chạy ứng dụng, `DbInitializer` tự `Migrate()`) để áp dụng migration
+`AddContentVisibility` (thêm `Posts.Visibility`, `Pages.Visibility`, `Pages.AuthorId`; dữ liệu cũ mặc định `Public`).
+
 ## Cấu hình
 
 | Mục | Ở đâu |

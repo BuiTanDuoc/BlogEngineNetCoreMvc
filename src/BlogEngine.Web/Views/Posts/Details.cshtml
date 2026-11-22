@@ -16,6 +16,15 @@
         <div class="alert alert-warning">@L["This post is not public yet — only you can see this preview."]</div>
     }
 
+    @if (post.Visibility == ContentVisibility.Private)
+    {
+        <div class="alert alert-info">🔒 @L["Private post — only signed-in users can see it."]</div>
+    }
+    else if (post.Visibility == ContentVisibility.Personal)
+    {
+        <div class="alert alert-info">👤 @L["Personal post — only you can see it."]</div>
+    }
+
     @if (post.Categories.Count > 0)
     {
         <span class="eyebrow">

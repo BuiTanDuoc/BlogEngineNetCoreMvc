@@ -1,4 +1,5 @@
 using BlogEngine.Web.Data;
+using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Infrastructure;
 using BlogEngine.Web.Models;
 using BlogEngine.Web.Services;
@@ -27,8 +28,14 @@ public class HomeController : LocalizedController
     public async Task<IActionResult> Index(int page = 1)
     {
         // Nếu có trang được đặt làm "front page" thì hiển thị nó ở trang chủ (giống BlogEngine gốc).
+        // Trang front page chỉ dùng khi người xem được phép xem nó; nếu không thì rơi về danh sách bài như bình thường.
+        var signedIn = User.IsSignedIn();
+        var userId = signedIn ? User.GetUserId() : 0;
         var front = await _db.Pages.AsNoTracking()
-            .FirstOrDefaultAsync(p => p.IsFrontPage && p.IsPublished && !p.IsDeleted);
+            .FirstOrDefaultAsync(p => p.IsFrontPage && p.IsPublished && !p.IsDeleted
+                                      && (p.Visibility == ContentVisibility.Public
+                                          || (signedIn && p.Visibility == ContentVisibility.Private)
+                                          || (signedIn && p.Visibility == ContentVisibility.Personal && p.AuthorId == userId)));
         if (front is not null)
             return View("~/Views/Pages/Details.cshtml", front);
 
@@ -36,8 +43,7 @@ public class HomeController : LocalizedController
         if (Request.Query.ContainsKey("page"))
             return await ListAsync(page);
 
-        var now = DateTime.UtcNow;
-        var visible = _db.Posts.AsNoTracking().Visible();
+        var visible = _db.Posts.AsNoTracking().Visible(User);
 
         var settings = await _settings.GetAsync();
         if (settings.IsBlk)
@@ -53,13 +59,7 @@ public class HomeController : LocalizedController
                     .OrderByDescending(p => p.DateCreated).Take(HeroCount - hero.Count).ToSummary().ToListAsync());
             }
             var blkTopics = await _db.Categories.AsNoTracking()
-                .Select(c => new CategoryCard
-                {
-                    Name = c.Name,
-                    Slug = c.Slug,
-                    Description = c.Description,
-                    Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
-                })
+                .VisibleCategoryCards(User)
                 .Where(c => c.Count > 0)
                 .OrderByDescending(c => c.Count)
                 .Take(HomeTopicCount)
@@ -98,13 +98,7 @@ public class HomeController : LocalizedController
         var latest = await visible.Where(p => !featuredIds.Contains(p.Id))
             .OrderByDescending(p => p.DateCreated).Take(HomeLatestCount).ToSummary().ToListAsync();
         var topics = await _db.Categories.AsNoTracking()
-            .Select(c => new CategoryCard
-            {
-                Name = c.Name,
-                Slug = c.Slug,
-                Description = c.Description,
-                Count = c.Posts.Count(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now)
-            })
+            .VisibleCategoryCards(User)
             .Where(c => c.Count > 0)
             .OrderByDescending(c => c.Count)
             .Take(HomeTopicCount)
@@ -125,7 +119,7 @@ public class HomeController : LocalizedController
     private async Task<IActionResult> ListAsync(int page)
     {
         var settings = await _settings.GetAsync();
-        var query = _db.Posts.AsNoTracking().Visible().OrderByDescending(p => p.DateCreated).ToSummary();
+        var query = _db.Posts.AsNoTracking().Visible(User).OrderByDescending(p => p.DateCreated).ToSummary();
 
         var vm = new PostListViewModel
         {

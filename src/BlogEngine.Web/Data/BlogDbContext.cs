@@ -45,6 +45,8 @@ public class BlogDbContext : DbContext
             e.HasIndex(x => x.Slug).IsUnique();
             e.HasOne(x => x.Parent).WithMany(p => p.Children)
                 .HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.Author).WithMany()
+                .HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.Restrict);
         });
 
         b.Entity<Category>(e =>

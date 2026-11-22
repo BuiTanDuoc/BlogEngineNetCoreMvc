@@ -1,6 +1,7 @@
 using System.Text;
 using System.Xml.Linq;
 using BlogEngine.Web.Data;
+using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -51,20 +52,23 @@ public class SeoController : Controller
             .ToListAsync();
         foreach (var p in posts) Add($"/post/{Uri.EscapeDataString(p.Slug)}", p.DateModified);
 
-        var pages = await _db.Pages.AsNoTracking()
-            .Where(p => p.IsPublished && !p.IsDeleted)
+        // Sitemap dành cho bot/khách: chỉ liệt kê nội dung Public (Visible() không truyền viewer = khách).
+        var pages = await _db.Pages.AsNoTracking().Visible()
             .Select(p => new { p.Slug, p.DateModified })
             .ToListAsync();
         foreach (var p in pages) Add($"/page/{Uri.EscapeDataString(p.Slug)}", p.DateModified);
 
+        var now = DateTime.UtcNow;
         var categories = await _db.Categories.AsNoTracking()
-            .Where(c => c.Posts.Any())
+            .Where(c => c.Posts.Any(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now
+                                         && p.Visibility == ContentVisibility.Public))
             .Select(c => c.Slug)
             .ToListAsync();
         foreach (var slug in categories) Add($"/category/{Uri.EscapeDataString(slug)}");
 
         var tags = await _db.Tags.AsNoTracking()
-            .Where(t => t.Posts.Any())
+            .Where(t => t.Posts.Any(p => p.IsPublished && !p.IsDeleted && p.DateCreated <= now
+                                         && p.Visibility == ContentVisibility.Public))
             .Select(t => t.Slug)
             .ToListAsync();
         foreach (var slug in tags) Add($"/tag/{Uri.EscapeDataString(slug)}");
