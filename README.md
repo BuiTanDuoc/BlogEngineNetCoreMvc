@@ -27,6 +27,9 @@ Lần chạy đầu ứng dụng tự tạo database, role (`Administrators`, `E
 dotnet user-secrets set "Seed:AdminPassword" "mat-khau-cua-ban"     # tuỳ chọn, trước lần chạy đầu
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Database=...;..."
 ```
+<p align="center">
+  <a href="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc"><img src="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc/blob/Master/Images/ScreenShoot.jpg" alt="BlogMvc"></a>
+</p>
 
 ## EF Core migrations
 
