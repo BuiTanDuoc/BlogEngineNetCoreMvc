@@ -27,9 +27,6 @@ Lần chạy đầu ứng dụng tự tạo database, role (`Administrators`, `E
 dotnet user-secrets set "Seed:AdminPassword" "mat-khau-cua-ban"     # tuỳ chọn, trước lần chạy đầu
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Database=...;..."
 ```
-<p align="center">
-  <a href="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc"><img src="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc/blob/Master/Images/ScreenShoot.jpg" alt="BlogMvc"></a>
-</p>
 
 ## EF Core migrations
 
@@ -223,3 +220,19 @@ IIS `requestLimits maxAllowedContentLength` (byte) trong `web.config`; nginx `cl
 Lưu ý: mp4 nên dùng H.264 + AAC để mọi trình duyệt phát được; nút "Preview" trong trình soạn thảo chạy trong iframe sandbox
 nên **không phát được YouTube** (xem trên trang bài viết); video tải lên vẫn xem được. Video nằm trong `wwwroot/uploads`
 nên truy cập được bằng URL trực tiếp — không được bảo vệ bởi Visibility Private/Personal (giống ảnh).
+
+## Trình soạn thảo WYSIWYG (bài viết + trang)
+
+Ô nội dung của **Posts** và **Pages** dùng [TinyMCE 6.8](https://www.tiny.cloud/) (giấy phép MIT, tự host trong `wwwroot/lib/tinymce`,
+không gọi CDN). Cấu hình nằm ở `wwwroot/js/editor.js`, partial `Areas/Admin/Views/Shared/_RichEditor.cshtml`.
+
+- Định dạng: đoạn/Heading 2–4, **font chữ**, **cỡ chữ**, **màu chữ**, **màu nền** (bảng màu + màu tuỳ chọn), đậm/nghiêng/gạch chân/gạch ngang,
+  căn lề, danh sách, thụt lề, link, bảng, trích dẫn, code, đường kẻ ngang, emoji, ký tự đặc biệt, xoá định dạng.
+- Ảnh: dán / kéo thả / tab Upload trong hộp thoại ảnh → tải lên `wwwroot/uploads` qua `/admin/media/uploadimage`.
+- Nút **▶ YouTube** và **🎞 Video** (xem mục "Video trong bài viết").
+- Nút `<>` (Source code) vẫn cho sửa HTML thô. Nội dung vẫn lưu dạng HTML trong cột `Content`, không cần migration.
+- Giao diện editor theo ngôn ngữ (vi/en) và theo chế độ sáng/tối lúc tải trang.
+- Font chữ chỉ gồm font hệ thống (Arial, Verdana, Tahoma, Times New Roman, Georgia…) vì trang công khai không tải web font.
+
+Lưu ý: màu chữ/màu nền đặt bằng editor là màu cố định (inline style), **không đổi theo chế độ sáng/tối** của site. Chữ đen đặt tay sẽ khó đọc
+ở giao diện tối; nên để màu mặc định cho chữ thường và chỉ tô màu cho đoạn cần nhấn mạnh.

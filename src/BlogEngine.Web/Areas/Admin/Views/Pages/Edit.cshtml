@@ -12,7 +12,7 @@
         <div class="field"><label asp-for="Slug"></label><input asp-for="Slug" maxlength="200" placeholder="@L["auto from title"]" /></div>
         <div class="field"><label asp-for="Description"></label><textarea asp-for="Description" rows="2"></textarea></div>
         <div class="field"><label asp-for="Keywords"></label><input asp-for="Keywords" maxlength="500" /></div>
-        <div class="field"><label for="editor">@L["Content (HTML)"]</label><partial name="_RichEditor" model="Model.Content" /></div>
+        <div class="field"><label for="editor">@L["Content"]</label><partial name="_RichEditor" model="Model.Content" /></div>
     </div>
     <div>
         <div class="panel">

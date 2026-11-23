@@ -414,4 +414,8 @@
   <data name="The video is too large for the server limit." xml:space="preserve"><value>Video vượt quá giới hạn dung lượng của máy chủ.</value></data>
   <data name="Only video files are allowed." xml:space="preserve"><value>Chỉ cho phép tệp video (MP4, WebM).</value></data>
   <data name="Video is larger than {0} MB." xml:space="preserve"><value>Video lớn hơn {0} MB.</value></data>
+  <data name="YouTube link" xml:space="preserve"><value>Link YouTube</value></data>
+  <data name="Horizontal line" xml:space="preserve"><value>Đường kẻ ngang</value></data>
+  <data name="Visual" xml:space="preserve"><value>Trực quan</value></data>
+  <data name="Editor mode" xml:space="preserve"><value>Chế độ soạn thảo</value></data>
 </root>
