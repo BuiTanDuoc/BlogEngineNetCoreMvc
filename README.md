@@ -29,7 +29,7 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Databa
 ```
 
 <p align="center">
-  <a href="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc/blob/Master/Images/ScreenShoot.jpg" alt="Adsun Vietkey"></a>
+  <a href="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc/blob/Master/Images/ScreenShoot.jpg" alt="BlogMvc"></a>
 </p>
 
 ## EF Core migrations
@@ -201,3 +201,26 @@ Môi trường tạo project này **không có SQL Server và không tải đư�
   khoá ngoại/cascade, và script `database/legacy-data-migration.sql` đều chưa được thử. Hãy build, chạy và duyệt các trang chính
   trên database thật trước khi dùng.
 - Chưa có project test tự động (các test trên chạy bằng harness tạm, không kèm trong repo).
+
+## Video trong bài viết (YouTube + upload)
+
+Trình soạn thảo (bài viết và trang) có thêm 2 nút:
+
+- **▶ YouTube** — dán link `youtube.com/watch?v=…`, `youtu.be/…`, `/shorts/…`, `/live/…` (hỗ trợ `t=90` / `t=1m30s`) hoặc ID 11 ký tự.
+  Chèn khối `<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/ID">` (responsive 16:9, chế độ privacy-enhanced).
+  Link không phải YouTube bị từ chối ở phía trình duyệt.
+- **🎞 Video** — tải file `.mp4` / `.webm` lên `wwwroot/uploads/yyyy/MM/` (có thanh % tiến độ) rồi chèn `<video controls preload="metadata">`.
+  Server kiểm tra phần mở rộng + chữ ký file (magic bytes) và dung lượng. Trang **Admin → Media** cũng upload/xem/xoá được video.
+
+Cấu hình dung lượng tối đa (MB) trong `appsettings.json`:
+
+```json
+"Media": { "MaxVideoMb": 200 }
+```
+
+Ảnh và PDF vẫn giới hạn 10 MB. Khi chạy sau IIS / nginx phải nâng giới hạn của chúng tương ứng:
+IIS `requestLimits maxAllowedContentLength` (byte) trong `web.config`; nginx `client_max_body_size`.
+
+Lưu ý: mp4 nên dùng H.264 + AAC để mọi trình duyệt phát được; nút "Preview" trong trình soạn thảo chạy trong iframe sandbox
+nên **không phát được YouTube** (xem trên trang bài viết); video tải lên vẫn xem được. Video nằm trong `wwwroot/uploads`
+nên truy cập được bằng URL trực tiếp — không được bảo vệ bởi Visibility Private/Personal (giống ảnh).

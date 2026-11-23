@@ -5,6 +5,7 @@ using BlogEngine.Web.Data.Entities;
 using BlogEngine.Web.Infrastructure;
 using BlogEngine.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ builder.Services.AddDbContext<BlogDbContext>(options =>
 // ---------- Services ----------
 builder.Services.AddMemoryCache();
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<MediaOptions>(builder.Configuration.GetSection("Media"));
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -72,6 +74,11 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
         new SettingsRequestCultureProvider()
     };
 });
+
+// Upload video: nâng giới hạn multipart (mặc định 128 MB) lên bằng giới hạn video cấu hình trong Media:MaxVideoMb.
+var mediaOptions = builder.Configuration.GetSection("Media").Get<MediaOptions>() ?? new MediaOptions();
+builder.Services.Configure<FormOptions>(o =>
+    o.MultipartBodyLengthLimit = Math.Max(o.MultipartBodyLengthLimit, mediaOptions.MaxVideoBytes + 1024 * 1024));
 
 // ---------- Rate limiting (chống spam comment/contact và brute-force đăng nhập) ----------
 builder.Services.AddRateLimiter(options =>
@@ -148,6 +155,21 @@ app.UseMiddleware<LegacyUrlMiddleware>();
 app.UseStaticFiles();
 
 app.UseRequestLocalization();
+
+// Kestrel mặc định chỉ nhận body ~30 MB. Chỉ nâng giới hạn cho các endpoint upload của khu quản trị,
+// và phải làm trước MVC vì bộ lọc anti-forgery đọc form trước khi action chạy.
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method)
+        && (context.Request.Path.StartsWithSegments("/admin/media/upload")
+            || context.Request.Path.StartsWithSegments("/admin/media/uploadvideo")))
+    {
+        var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (feature is { IsReadOnly: false })
+            feature.MaxRequestBodySize = mediaOptions.MaxVideoBytes + 1024 * 1024;
+    }
+    await next();
+});
 
 app.UseRouting();
 app.UseRateLimiter();

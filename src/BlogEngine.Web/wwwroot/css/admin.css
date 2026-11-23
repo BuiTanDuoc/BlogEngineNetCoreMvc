@@ -49,6 +49,9 @@ table.grid tr:last-child td { border-bottom: 0; }
 .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
 .thumb { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .6rem; font-size: .8rem; overflow-wrap: anywhere; }
 .thumb img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: .4rem; }
+.thumb video { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: .4rem; background: #000; }
+.editor-toolbar button:disabled { opacity: .5; cursor: progress; }
+.editor-toolbar #editor-status { align-self: center; margin-left: .5rem; }
 .thumb .file-icon { height: 110px; display: grid; place-items: center; background: var(--bg); border-radius: 6px; margin-bottom: .4rem; font-weight: 700; }
 .comment-text { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 60ch; }
 

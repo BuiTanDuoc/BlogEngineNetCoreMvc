@@ -25,6 +25,40 @@
     editor.focus();
   }
 
+  var toolbar = document.querySelector('.editor-toolbar');
+  var status = document.getElementById('editor-status');
+  var messages = {
+    youtubePrompt: toolbar && toolbar.getAttribute('data-msg-youtube-prompt'),
+    youtubeInvalid: toolbar && toolbar.getAttribute('data-msg-youtube-invalid'),
+    uploading: toolbar && toolbar.getAttribute('data-msg-uploading'),
+    uploadFailed: toolbar && toolbar.getAttribute('data-msg-upload-failed'),
+    tooLarge: toolbar && toolbar.getAttribute('data-msg-too-large')
+  };
+  function msg(key, fallback) { return messages[key] || fallback; }
+
+  // Nhận watch?v=, youtu.be/, /embed/, /shorts/, /live/ (kèm t=90 / t=1m30s) hoặc chính ID 11 ký tự.
+  function parseYouTube(input) {
+    input = (input || '').trim();
+    var ID = /^[A-Za-z0-9_-]{11}$/;
+    if (ID.test(input)) return { id: input, start: 0 };
+    var u;
+    try { u = new URL(/^https?:\/\//i.test(input) ? input : 'https://' + input); } catch (e) { return null; }
+    var host = u.hostname.replace(/^(www|m|music)\./, '');
+    var id = null, m;
+    if (host === 'youtu.be') id = u.pathname.split('/')[1];
+    else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+      if (u.pathname === '/watch') id = u.searchParams.get('v');
+      else if ((m = u.pathname.match(/^\/(?:embed|shorts|live|v)\/([A-Za-z0-9_-]{11})/))) id = m[1];
+    }
+    if (!id || !ID.test(id)) return null;
+
+    var t = u.searchParams.get('t') || u.searchParams.get('start') || '';
+    var start = 0;
+    if (/^\d+$/.test(t)) start = parseInt(t, 10);
+    else if ((m = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/)) && t) start = (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
+    return { id: id, start: start };
+  }
+
   var actions = {
     bold: function () { wrap('<strong>', '</strong>'); },
     italic: function () { wrap('<em>', '</em>'); },
@@ -39,6 +73,17 @@
       if (url && /^(https?:\/\/|\/|#|mailto:)/i.test(url)) wrap('<a href="' + url.replace(/"/g, '&quot;') + '">', '</a>');
     },
     image: function () { document.getElementById('image-file').click(); },
+    youtube: function () {
+      var raw = window.prompt(msg('youtubePrompt', 'Paste a YouTube link:'));
+      if (!raw) return;
+      var v = parseYouTube(raw);
+      if (!v) { window.alert(msg('youtubeInvalid', 'Not a valid YouTube link.')); return; }
+      var src = 'https://www.youtube-nocookie.com/embed/' + v.id + (v.start ? '?start=' + v.start : '');
+      insert('\n<div class="video-embed"><iframe src="' + src + '" title="YouTube video" loading="lazy" ' +
+        'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+        'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>\n');
+    },
+    video: function () { document.getElementById('video-file').click(); },
     preview: function () {
       var frame = document.getElementById('preview');
       var showing = !frame.hidden;
@@ -68,6 +113,44 @@
         })
         .catch(function () { window.alert('Upload failed'); })
         .finally(function () { fileInput.value = ''; });
+    });
+  }
+
+  // ---- Upload video (XHR để hiện % tiến độ; video có thể nặng hàng trăm MB) ----
+  var videoInput = document.getElementById('video-file');
+  if (videoInput) {
+    videoInput.addEventListener('change', function () {
+      if (!videoInput.files.length) return;
+      var data = new FormData();
+      data.append('file', videoInput.files[0]);
+      data.append('__RequestVerificationToken', token);
+
+      var buttons = document.querySelectorAll('.editor-toolbar button');
+      function busy(on) { buttons.forEach(function (b) { b.disabled = on; }); }
+      function done(text) { busy(false); status.textContent = text || ''; videoInput.value = ''; }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/admin/media/uploadvideo');
+      xhr.withCredentials = true;
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) status.textContent = msg('uploading', 'Uploading video…') + ' ' + Math.round(e.loaded / e.total * 100) + '%';
+      };
+      xhr.onerror = function () { done(); window.alert(msg('uploadFailed', 'Video upload failed.')); };
+      xhr.onload = function () {
+        var body = null;
+        try { body = JSON.parse(xhr.responseText); } catch (e) { /* trả về HTML (vd. 413) */ }
+        if (xhr.status >= 200 && xhr.status < 300 && body && body.url) {
+          insert('\n<video controls preload="metadata" playsinline src="' + body.url + '"></video>\n');
+          done();
+        } else {
+          done();
+          window.alert(xhr.status === 413 ? msg('tooLarge', 'The video is too large for the server limit.')
+            : (body && body.error) || msg('uploadFailed', 'Video upload failed.'));
+        }
+      };
+      busy(true);
+      status.textContent = msg('uploading', 'Uploading video…') + ' 0%';
+      xhr.send(data);
     });
   }
 

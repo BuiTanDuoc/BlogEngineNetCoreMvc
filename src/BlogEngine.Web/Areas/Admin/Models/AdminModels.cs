@@ -175,4 +175,5 @@ public class MediaFile
     public long Size { get; init; }
     public DateTime Modified { get; init; }
     public bool IsImage { get; init; }
+    public bool IsVideo { get; init; }
 }
