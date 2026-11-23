@@ -28,6 +28,10 @@ dotnet user-secrets set "Seed:AdminPassword" "mat-khau-cua-ban"     # tuỳ ch�
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Database=...;..."
 ```
 
+<p align="center">
+  <a href="https://github.com/BuiTanDuoc/BlogEngineNetCoreMvc/blob/Master/Images/ScreenShoot.jpg" alt="Adsun Vietkey"></a>
+</p>
+
 ## EF Core migrations
 
 Chưa kèm sẵn file migration (môi trường tạo project không có `dotnet-ef`/NuGet). Khi chưa có migration, ứng dụng dùng
