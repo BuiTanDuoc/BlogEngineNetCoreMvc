@@ -10,11 +10,7 @@ namespace BlogEngine.Web.Areas.Admin.Controllers;
 /// <summary>Quản lý file upload (thay cho File Manager lưu trong DB/App_Data của BlogEngine cũ).</summary>
 public class MediaController : AdminControllerBase
 {
-    private const long MaxBytes = 10 * 1024 * 1024; // ảnh + PDF
-    private static readonly string[] ImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-    // Chỉ nhận định dạng mọi trình duyệt phát được trực tiếp bằng thẻ <video>.
-    private static readonly string[] VideoExtensions = { ".mp4", ".webm" };
-    private static readonly string[] AllowedExtensions = ImageExtensions.Concat(VideoExtensions).Append(".pdf").ToArray();
+    private const long MaxImageBytes = 10 * 1024 * 1024; // ảnh
 
     private readonly string _root;
     private readonly MediaOptions _options;
@@ -26,31 +22,71 @@ public class MediaController : AdminControllerBase
         _root = Path.GetFullPath(Path.Combine(webRoot, "uploads"));
     }
 
-    public IActionResult Index()
+    private IEnumerable<MediaFile> Scan()
     {
         Directory.CreateDirectory(_root);
-        var files = new DirectoryInfo(_root)
+        return new DirectoryInfo(_root)
             .EnumerateFiles("*", SearchOption.AllDirectories)
-            .Where(f => AllowedExtensions.Contains(f.Extension.ToLowerInvariant()))
+            .Where(f => MediaTypes.All.Contains(f.Extension.ToLowerInvariant()))
             .OrderByDescending(f => f.LastWriteTimeUtc)
-            .Take(300)
             .Select(f =>
             {
                 var rel = Path.GetRelativePath(_root, f.FullName).Replace('\\', '/');
                 var ext = f.Extension.ToLowerInvariant();
+                var kind = MediaTypes.KindOf(ext);
                 return new MediaFile
                 {
                     RelativePath = rel,
                     Url = "/uploads/" + string.Join('/', rel.Split('/').Select(Uri.EscapeDataString)),
                     Size = f.Length,
                     Modified = f.LastWriteTimeUtc,
-                    IsImage = ImageExtensions.Contains(ext),
-                    IsVideo = VideoExtensions.Contains(ext)
+                    IsImage = kind == "image",
+                    IsVideo = kind == "video",
+                    Kind = kind,
+                    Name = DisplayName(f.Name),
+                    Ext = ext.TrimStart('.').ToUpperInvariant()
                 };
-            })
-            .ToList();
+            });
+    }
+
+    /// <summary>"bao-cao-thang-11-a1b2c3.docx" → "bao-cao-thang-11.docx".</summary>
+    private static string DisplayName(string storedName)
+    {
+        var ext = Path.GetExtension(storedName);
+        var baseName = Path.GetFileNameWithoutExtension(storedName);
+        baseName = System.Text.RegularExpressions.Regex.Replace(baseName, "-[0-9a-f]{6}$", "");
+        return baseName + ext;
+    }
+
+    /// <param name="type">all | image | document | archive | video</param>
+    public IActionResult Index(string? type, string? q)
+    {
+        type = (type ?? "all").ToLowerInvariant();
+        var files = Scan();
+        if (type is "image" or "document" or "archive" or "video") files = files.Where(f => f.Kind == type);
+        if (!string.IsNullOrWhiteSpace(q))
+            files = files.Where(f => f.Name.Contains(q.Trim(), StringComparison.OrdinalIgnoreCase));
+
         ViewBag.MaxVideoMb = _options.MaxVideoMb;
-        return View(files);
+        ViewBag.MaxFileMb = _options.MaxFileMb;
+        ViewBag.Type = type;
+        ViewBag.Query = q;
+        return View(files.Take(500).ToList());
+    }
+
+    /// <summary>Danh sách file cho hộp thoại chọn file trong trình soạn thảo. kind: image | video | file (tài liệu + nén) | all.</summary>
+    [HttpGet]
+    public IActionResult Browse(string? kind)
+    {
+        var files = Scan();
+        files = (kind ?? "all").ToLowerInvariant() switch
+        {
+            "image" => files.Where(f => f.Kind == "image"),
+            "video" => files.Where(f => f.Kind == "video"),
+            "file" => files.Where(f => f.Kind is "document" or "archive"),
+            _ => files
+        };
+        return Json(files.Take(200).Select(f => new { url = f.Url, name = f.Name, size = f.Size, kind = f.Kind }));
     }
 
     // Giới hạn body của /admin/media/upload* được nâng bằng middleware trong Program.cs
@@ -74,7 +110,7 @@ public class MediaController : AdminControllerBase
     public async Task<IActionResult> UploadImage(IFormFile file)
     {
         if (file is null) return BadRequest(new { error = L["No file."].Value });
-        if (!ImageExtensions.Contains(Path.GetExtension(file.FileName).ToLowerInvariant()))
+        if (!MediaTypes.Images.Contains(Path.GetExtension(file.FileName).ToLowerInvariant()))
             return BadRequest(new { error = L["Only image files are allowed."].Value });
 
         var (url, error) = await SaveAsync(file);
@@ -86,11 +122,22 @@ public class MediaController : AdminControllerBase
     public async Task<IActionResult> UploadVideo(IFormFile file)
     {
         if (file is null) return BadRequest(new { error = L["No file."].Value });
-        if (!VideoExtensions.Contains(Path.GetExtension(file.FileName).ToLowerInvariant()))
+        if (!MediaTypes.Videos.Contains(Path.GetExtension(file.FileName).ToLowerInvariant()))
             return BadRequest(new { error = L["Only video files are allowed."].Value });
 
         var (url, error) = await SaveAsync(file);
         return url is null ? BadRequest(new { error }) : Json(new { url });
+    }
+
+    /// <summary>Endpoint cho nút chèn link tải file (zip, Office, PDF...) trong trình soạn thảo (AJAX).</summary>
+    [HttpPost]
+    public async Task<IActionResult> UploadFile(IFormFile file)
+    {
+        if (file is null) return BadRequest(new { error = L["No file."].Value });
+
+        var (url, error) = await SaveAsync(file);
+        if (url is null) return BadRequest(new { error });
+        return Json(new { url, name = Path.GetFileName(file.FileName), size = file.Length, kind = MediaTypes.KindOf(Path.GetExtension(url).ToLowerInvariant()) });
     }
 
     [HttpPost]
@@ -112,16 +159,20 @@ public class MediaController : AdminControllerBase
         if (file.Length == 0) return (null, L["Empty file."].Value);
 
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!AllowedExtensions.Contains(ext)) return (null, L["Unsupported file type (images, video and PDF only)."].Value);
+        if (!MediaTypes.All.Contains(ext)) return (null, L["Unsupported file type."].Value);
 
-        var isVideo = VideoExtensions.Contains(ext);
-        if (isVideo)
+        var kind = MediaTypes.KindOf(ext);
+        if (kind == "video")
         {
             if (file.Length > _options.MaxVideoBytes) return (null, L["Video is larger than {0} MB.", _options.MaxVideoMb].Value);
         }
-        else if (file.Length > MaxBytes)
+        else if (kind == "image")
         {
-            return (null, L["File is larger than 10 MB."].Value);
+            if (file.Length > MaxImageBytes) return (null, L["File is larger than 10 MB."].Value);
+        }
+        else if (file.Length > _options.MaxFileBytes)
+        {
+            return (null, L["File is larger than {0} MB.", _options.MaxFileMb].Value);
         }
 
         // Kiểm tra chữ ký file (magic bytes) để không tin phần mở rộng do client gửi.
@@ -129,7 +180,7 @@ public class MediaController : AdminControllerBase
         await using (var probe = file.OpenReadStream())
         {
             var read = await probe.ReadAsync(header.AsMemory(0, header.Length));
-            if (!MatchesSignature(ext, header, read)) return (null, L["File content does not match its extension."].Value);
+            if (!MediaTypes.MatchesSignature(ext, header, read)) return (null, L["File content does not match its extension."].Value);
         }
 
         var now = DateTime.UtcNow;
@@ -144,24 +195,5 @@ public class MediaController : AdminControllerBase
             await file.CopyToAsync(target);
 
         return ($"/uploads/{now:yyyy}/{now:MM}/{fileName}", null);
-    }
-
-    private static bool MatchesSignature(string ext, byte[] h, int len)
-    {
-        if (len < 4) return false;
-        return ext switch
-        {
-            ".jpg" or ".jpeg" => h[0] == 0xFF && h[1] == 0xD8 && h[2] == 0xFF,
-            ".png" => h[0] == 0x89 && h[1] == 0x50 && h[2] == 0x4E && h[3] == 0x47,
-            ".gif" => h[0] == 'G' && h[1] == 'I' && h[2] == 'F' && h[3] == '8',
-            ".webp" => len >= 12 && h[0] == 'R' && h[1] == 'I' && h[2] == 'F' && h[3] == 'F'
-                       && h[8] == 'W' && h[9] == 'E' && h[10] == 'B' && h[11] == 'P',
-            ".pdf" => h[0] == '%' && h[1] == 'P' && h[2] == 'D' && h[3] == 'F',
-            // MP4: 4 byte độ dài box + "ftyp"
-            ".mp4" => len >= 12 && h[4] == 'f' && h[5] == 't' && h[6] == 'y' && h[7] == 'p',
-            // WebM (EBML header)
-            ".webm" => h[0] == 0x1A && h[1] == 0x45 && h[2] == 0xDF && h[3] == 0xA3,
-            _ => false
-        };
     }
 }

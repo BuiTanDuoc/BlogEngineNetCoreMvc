@@ -16,3 +16,17 @@
     });
   }
 })();
+
+// Nút "Copy link" trong trang Media: <button data-copy="/uploads/..." data-copied="Đã chép!">
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest && e.target.closest('[data-copy]');
+  if (!btn) return;
+  var url = location.origin + btn.getAttribute('data-copy');
+  var done = function () {
+    var old = btn.textContent;
+    btn.textContent = btn.getAttribute('data-copied') || 'Copied!';
+    setTimeout(function () { btn.textContent = old; }, 1500);
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done);
+  else { var t = document.createElement('input'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); done(); }
+});

@@ -53,12 +53,82 @@
       xhr.onload = function () {
         var body = null;
         try { body = JSON.parse(xhr.responseText); } catch (e) { /* HTML (vd. 413) */ }
-        if (xhr.status >= 200 && xhr.status < 300 && body && body.url) resolve(body.url);
+        if (xhr.status >= 200 && xhr.status < 300 && body && body.url) resolve(body);
         else reject(xhr.status === 413 ? msg('too-large', 'File too large for the server limit.')
           : (body && body.error) || msg('upload-failed', 'Upload failed.'));
       };
       xhr.send(data);
     });
+  }
+
+  function fmtSize(n) {
+    return n >= 1048576 ? (n / 1048576).toFixed(1).replace(/\.0$/, '') + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+  }
+
+  function notifyError(editor, text) {
+    editor.notificationManager.open({ text: String(text), type: 'error', timeout: 6000 });
+  }
+
+  // Hộp thoại chọn file: tab "Tải lên" (kéo thả / chọn file) và tab "Thư viện" (file đã upload trước đó).
+  // kind: 'file' (zip/Office/PDF...), 'image' hoặc 'video'. onPick nhận { url, name, size }.
+  function openPicker(editor, kind, onPick) {
+    var endpoint = kind === 'image' ? '/admin/media/uploadimage' : kind === 'video' ? '/admin/media/uploadvideo' : '/admin/media/uploadfile';
+    fetch('/admin/media/browse?kind=' + encodeURIComponent(kind), { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .catch(function () { return []; })
+      .then(function (items) {
+        var byUrl = {};
+        var options = [{ value: '', text: msg('pick-choose', '— choose a file —') }];
+        items.forEach(function (it) {
+          byUrl[it.url] = it;
+          options.push({ value: it.url, text: it.name + ' (' + fmtSize(it.size) + ')' });
+        });
+
+        editor.windowManager.open({
+          title: msg('pick-title', 'Insert file'),
+          size: 'medium',
+          body: {
+            type: 'tabpanel',
+            tabs: [
+              { name: 'upload', title: msg('tab-upload', 'Upload'), items: [{ type: 'dropzone', name: 'files', label: msg('pick-drop', 'Drop a file here or click to choose') }] },
+              { name: 'library', title: msg('tab-library', 'Library'), items: [{ type: 'selectbox', name: 'lib', label: msg('tab-library', 'Library'), items: options }] }
+            ]
+          },
+          buttons: [
+            { type: 'cancel', text: 'Cancel' },
+            { type: 'submit', text: 'Insert', buttonType: 'primary' }
+          ],
+          onSubmit: function (api) {
+            var d = api.getData();
+            var files = d.files || [];
+            if (files.length) {
+              api.block(msg('uploading-file', 'Uploading file…'));
+              upload(endpoint, files[0], null).then(function (r) {
+                api.close();
+                onPick({ url: r.url, name: r.name || files[0].name, size: r.size || files[0].size });
+              }).catch(function (err) {
+                api.unblock();
+                notifyError(editor, err);
+              });
+              return;
+            }
+            if (d.lib && byUrl[d.lib]) {
+              api.close();
+              onPick(byUrl[d.lib]);
+              return;
+            }
+            notifyError(editor, msg('pick-none', 'Upload a file or choose one from the library.'));
+          }
+        });
+      });
+  }
+
+  // Chèn link tải file: dùng chữ đang bôi đen làm nhãn (nếu có), không thì dùng tên file.
+  function insertFileLink(editor, it) {
+    var enc = editor.dom.encode;
+    var label = editor.selection.getContent({ format: 'text' }).trim() || it.name;
+    var size = it.size ? ' <small>(' + fmtSize(it.size) + ')</small>' : '';
+    editor.insertContent('<a href="' + enc(it.url) + '" download="' + enc(it.name) + '">' + enc(label) + '</a>' + size + '&nbsp;');
   }
 
   var cfg = {
@@ -77,7 +147,7 @@
     plugins: 'advlist autolink lists link image charmap searchreplace visualblocks code fullscreen preview table wordcount codesample emoticons',
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | ' +
              'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
-             'link image ytb videoup table | blockquote codesample hrline emoticons charmap | removeformat | ' +
+             'link image attachfile ytb videoup table | blockquote codesample hrline emoticons charmap | removeformat | ' +
              'visualblocks searchreplace preview fullscreen code',
 
     block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre',
@@ -99,6 +169,7 @@
     table_default_styles: { width: '100%' },
     // YouTube iframe + thẻ <video> do nút YouTube/Video chèn vào.
     extended_valid_elements:
+      'a[href|target|rel|download|title|class|style],' +
       'iframe[src|title|loading|allow|referrerpolicy|allowfullscreen|frameborder|width|height|class|style],' +
       'video[src|controls|preload|playsinline|poster|width|height|class|style|muted|loop|autoplay],source[src|type]',
 
@@ -115,10 +186,23 @@
     automatic_uploads: true,
     paste_data_images: true,
     images_upload_handler: function (blobInfo) {
-      return upload('/admin/media/uploadimage', blobInfo.blob(), null, blobInfo.filename());
+      return upload('/admin/media/uploadimage', blobInfo.blob(), null, blobInfo.filename()).then(function (r) { return r.url; });
+    },
+
+    // Nút "browse" trong hộp thoại Link / Image mở hộp thoại chọn file ở trên.
+    file_picker_types: 'file image',
+    file_picker_callback: function (cb, value, meta) {
+      var kind = meta.filetype === 'image' ? 'image' : 'file';
+      openPicker(tinymce.activeEditor, kind, function (it) { cb(it.url, { text: it.name, title: it.name }); });
     },
 
     setup: function (editor) {
+      editor.ui.registry.addButton('attachfile', {
+        text: '📎 File',
+        tooltip: msg('attach-file', 'Insert a download link (zip, Word, Excel, PDF…)'),
+        onAction: function () { openPicker(editor, 'file', function (it) { insertFileLink(editor, it); }); }
+      });
+
       editor.ui.registry.addButton('ytb', {
         text: '▶ YouTube',
         tooltip: msg('embed-youtube', 'Embed a YouTube video'),
@@ -167,9 +251,9 @@
           upload('/admin/media/uploadvideo', file, function (pct) {
             note.progressBar.value(pct);
             note.text(msg('uploading', 'Uploading video…') + ' ' + pct + '%');
-          }).then(function (url) {
+          }).then(function (r) {
             note.close();
-            editor.insertContent('<video controls preload="metadata" playsinline src="' + url + '"></video><p></p>');
+            editor.insertContent('<video controls preload="metadata" playsinline src="' + r.url + '"></video><p></p>');
           }).catch(function (err) {
             note.close();
             editor.notificationManager.open({ text: String(err), type: 'error', timeout: 8000 });

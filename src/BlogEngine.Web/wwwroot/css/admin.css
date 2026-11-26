@@ -59,3 +59,9 @@ table.grid tr:last-child td { border-bottom: 0; }
 /* Công cụ ngôn ngữ + theme ở sidebar admin */
 .admin-tools { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
 .admin .alert-danger { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); }
+
+/* ---- Quản lý file ---- */
+.media-filter input[type=search] { max-width: 240px; margin-left: auto; }
+.thumb .file-name { font-weight: 600; margin-bottom: .3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumb .file-icon.file-archive { background: #f59e0b22; color: #b45309; }
+.thumb .file-icon.file-document { background: #3b82f622; color: #1d4ed8; }

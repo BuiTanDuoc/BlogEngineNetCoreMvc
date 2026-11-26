@@ -78,7 +78,7 @@ builder.Services.Configure<RequestLocalizationOptions>(o =>
 // Upload video: nâng giới hạn multipart (mặc định 128 MB) lên bằng giới hạn video cấu hình trong Media:MaxVideoMb.
 var mediaOptions = builder.Configuration.GetSection("Media").Get<MediaOptions>() ?? new MediaOptions();
 builder.Services.Configure<FormOptions>(o =>
-    o.MultipartBodyLengthLimit = Math.Max(o.MultipartBodyLengthLimit, mediaOptions.MaxVideoBytes + 1024 * 1024));
+    o.MultipartBodyLengthLimit = Math.Max(o.MultipartBodyLengthLimit, mediaOptions.MaxRequestBytes));
 
 // ---------- Rate limiting (chống spam comment/contact và brute-force đăng nhập) ----------
 builder.Services.AddRateLimiter(options =>
@@ -152,7 +152,19 @@ app.UseHttpsRedirection();
 app.UseResponseCompression();
 
 app.UseMiddleware<LegacyUrlMiddleware>();
-app.UseStaticFiles();
+// File zip/Office/txt/csv trong /uploads luôn được tải về (không mở inline) để tránh bị trình duyệt hiểu nhầm nội dung.
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = MediaTypes.CreateContentTypeProvider(),
+    OnPrepareResponse = ctx =>
+    {
+        if (ctx.Context.Request.Path.StartsWithSegments("/uploads")
+            && MediaTypes.ForceDownload(Path.GetExtension(ctx.File.Name).ToLowerInvariant()))
+        {
+            ctx.Context.Response.Headers.ContentDisposition = "attachment";
+        }
+    }
+});
 
 app.UseRequestLocalization();
 
@@ -162,11 +174,12 @@ app.Use(async (context, next) =>
 {
     if (HttpMethods.IsPost(context.Request.Method)
         && (context.Request.Path.StartsWithSegments("/admin/media/upload")
-            || context.Request.Path.StartsWithSegments("/admin/media/uploadvideo")))
+            || context.Request.Path.StartsWithSegments("/admin/media/uploadvideo")
+            || context.Request.Path.StartsWithSegments("/admin/media/uploadfile")))
     {
         var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
         if (feature is { IsReadOnly: false })
-            feature.MaxRequestBodySize = mediaOptions.MaxVideoBytes + 1024 * 1024;
+            feature.MaxRequestBodySize = mediaOptions.MaxRequestBytes;
     }
     await next();
 });

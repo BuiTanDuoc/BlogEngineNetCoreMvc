@@ -159,7 +159,7 @@ nút gradient chéo chữ in hoa, header trong suốt rồi đặc lại khi cu�
 | Membership/Role provider, rights chi tiết | Cookie auth + 2 role: `Administrators` (toàn quyền), `Editors` (viết bài/trang của mình, duyệt comment). Rights chi tiết **bỏ** |
 | Mật khẩu SHA-256 | PBKDF2 (ASP.NET Core Identity `PasswordHasher`), tự nâng cấp hash cũ, khoá tạm 15 phút sau 5 lần sai |
 | Admin AngularJS + Web API | Admin MVC + soạn thảo HTML cơ bản (toolbar + upload ảnh + preview an toàn trong iframe sandbox) |
-| File manager (DB/App_Data) | Media: upload ảnh/PDF vào `wwwroot/uploads` (kiểm tra magic bytes, 10 MB) |
+| File manager (DB/App_Data) | Media: upload ảnh/video/PDF/Office/zip vào `wwwroot/uploads` (kiểm tra magic bytes; lọc theo loại, tìm tên, chép link) |
 | Comment (nested, moderation, spam flag) | Giữ. Comment là văn bản thuần (encode HTML), honeypot + rate limit, Gravatar tuỳ chọn |
 | Rating bài viết | Giữ (1 lượt/trình duyệt qua cookie) |
 | Search, archive, category, tag, author, contact | Giữ; contact lưu DB + gửi mail nếu cấu hình SMTP |
@@ -214,7 +214,7 @@ Trình soạn thảo (bài viết và trang) có thêm 2 nút:
 Cấu hình dung lượng tối đa (MB) trong `appsettings.json`:
 
 ```json
-"Media": { "MaxVideoMb": 200 }
+"Media": { "MaxVideoMb": 200, "MaxFileMb": 50 }
 ```
 
 Ảnh và PDF vẫn giới hạn 10 MB. Khi chạy sau IIS / nginx phải nâng giới hạn của chúng tương ứng:
@@ -231,6 +231,10 @@ không gọi CDN). Cấu hình nằm ở `wwwroot/js/editor.js`, partial `Areas/
 
 - Định dạng: đoạn/Heading 2–4, **font chữ**, **cỡ chữ**, **màu chữ**, **màu nền** (bảng màu + màu tuỳ chọn), đậm/nghiêng/gạch chân/gạch ngang,
   căn lề, danh sách, thụt lề, link, bảng, trích dẫn, code, đường kẻ ngang, emoji, ký tự đặc biệt, xoá định dạng.
+- **📎 File** — chèn link tải file (`.zip .rar .7z .doc/.docx .xls/.xlsx .ppt/.pptx .pdf .txt .csv`): tab **Tải lên** hoặc tab **Thư viện**
+  (file đã upload). Chữ đang bôi đen sẽ thành nhãn link. Nút duyệt file trong hộp thoại Link/Image cũng dùng hộp thoại này.
+  Giới hạn `Media:MaxFileMb` (mặc định 50 MB). File zip/Office/txt/csv luôn được ép tải về (`Content-Disposition: attachment`).
+  Không nhận file có macro (`.docm/.xlsm`), HTML, SVG, exe/script.
 - Ảnh: dán / kéo thả / tab Upload trong hộp thoại ảnh → tải lên `wwwroot/uploads` qua `/admin/media/uploadimage`.
 - Nút **▶ YouTube** và **🎞 Video** (xem mục "Video trong bài viết").
 - Nút `<>` (Source code) vẫn cho sửa HTML thô. Nội dung vẫn lưu dạng HTML trong cột `Content`, không cần migration.

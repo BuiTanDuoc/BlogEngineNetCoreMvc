@@ -418,4 +418,22 @@
   <data name="Horizontal line" xml:space="preserve"><value>Đường kẻ ngang</value></data>
   <data name="Visual" xml:space="preserve"><value>Trực quan</value></data>
   <data name="Editor mode" xml:space="preserve"><value>Chế độ soạn thảo</value></data>
+  <data name="Images" xml:space="preserve"><value>Ảnh</value></data>
+  <data name="Documents" xml:space="preserve"><value>Tài liệu</value></data>
+  <data name="Archives" xml:space="preserve"><value>File nén</value></data>
+  <data name="Videos" xml:space="preserve"><value>Video</value></data>
+  <data name="Download" xml:space="preserve"><value>Tải về</value></data>
+  <data name="Copy link" xml:space="preserve"><value>Chép link</value></data>
+  <data name="Copied!" xml:space="preserve"><value>Đã chép!</value></data>
+  <data name="Search by file name" xml:space="preserve"><value>Tìm theo tên file</value></data>
+  <data name="Library" xml:space="preserve"><value>Thư viện</value></data>
+  <data name="Insert file" xml:space="preserve"><value>Chèn file</value></data>
+  <data name="Images up to 10 MB; documents and archives (PDF, Word, Excel, PowerPoint, TXT, CSV, ZIP, RAR, 7Z) up to {0} MB; videos (MP4, WebM) up to {1} MB." xml:space="preserve"><value>Ảnh tối đa 10 MB; tài liệu và file nén (PDF, Word, Excel, PowerPoint, TXT, CSV, ZIP, RAR, 7Z) tối đa {0} MB; video (MP4, WebM) tối đa {1} MB.</value></data>
+  <data name="Unsupported file type." xml:space="preserve"><value>Loại tệp không được hỗ trợ.</value></data>
+  <data name="File is larger than {0} MB." xml:space="preserve"><value>Tệp lớn hơn {0} MB.</value></data>
+  <data name="Insert a download link (zip, Word, Excel, PDF…)" xml:space="preserve"><value>Chèn link tải file (zip, Word, Excel, PDF…)</value></data>
+  <data name="Drop a file here or click to choose" xml:space="preserve"><value>Kéo thả file vào đây hoặc bấm để chọn</value></data>
+  <data name="— choose a file —" xml:space="preserve"><value>— chọn một file —</value></data>
+  <data name="Upload a file or choose one from the library." xml:space="preserve"><value>Hãy tải một file lên hoặc chọn từ thư viện.</value></data>
+  <data name="Uploading file…" xml:space="preserve"><value>Đang tải file lên…</value></data>
 </root>

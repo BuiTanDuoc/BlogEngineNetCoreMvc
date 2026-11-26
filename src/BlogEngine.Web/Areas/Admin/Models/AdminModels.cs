@@ -176,4 +176,10 @@ public class MediaFile
     public DateTime Modified { get; init; }
     public bool IsImage { get; init; }
     public bool IsVideo { get; init; }
+    /// <summary>"image" | "video" | "document" | "archive".</summary>
+    public string Kind { get; init; } = "document";
+    /// <summary>Tên dễ đọc (bỏ hậu tố ngẫu nhiên do hệ thống thêm).</summary>
+    public string Name { get; init; } = "";
+    /// <summary>Đuôi file viết hoa, không có dấu chấm (ZIP, DOCX...).</summary>
+    public string Ext { get; init; } = "";
 }

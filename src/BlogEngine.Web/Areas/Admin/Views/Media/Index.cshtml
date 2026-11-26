@@ -1,11 +1,31 @@
 @model List<MediaFile>
-@{ ViewData["Title"] = L["Media"].Value; }
+@{
+    ViewData["Title"] = L["Media"].Value;
+    var type = (string)ViewBag.Type;
+    var q = ViewBag.Query as string;
+    var accept = string.Join(",", MediaTypes.All);
+    var filters = new (string Key, string Label)[]
+    {
+        ("all", L["All"].Value), ("image", L["Images"].Value), ("document", L["Documents"].Value),
+        ("archive", L["Archives"].Value), ("video", L["Videos"].Value)
+    };
+}
 <h1>@L["Media"]</h1>
 
 <form asp-action="Upload" method="post" enctype="multipart/form-data" class="panel row-actions">
-    <input type="file" name="files" multiple accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,video/mp4,video/webm" required />
+    <input type="file" name="files" multiple accept="@accept" required />
     <button class="btn">@L["Upload"]</button>
-    <span class="muted small">@L["Images (JPG, PNG, GIF, WebP) and PDF up to 10 MB; videos (MP4, WebM) up to {0} MB.", ViewBag.MaxVideoMb]</span>
+    <span class="muted small">@L["Images up to 10 MB; documents and archives (PDF, Word, Excel, PowerPoint, TXT, CSV, ZIP, RAR, 7Z) up to {0} MB; videos (MP4, WebM) up to {1} MB.", ViewBag.MaxFileMb, ViewBag.MaxVideoMb]</span>
+</form>
+
+<form method="get" class="panel row-actions media-filter">
+    @foreach (var f in filters)
+    {
+        <a class="btn btn-small @(type == f.Key ? "" : "btn-secondary")" asp-action="Index" asp-route-type="@f.Key" asp-route-q="@q">@f.Label</a>
+    }
+    <input type="hidden" name="type" value="@type" />
+    <input type="search" name="q" value="@q" placeholder="@L["Search by file name"]" />
+    <button class="btn btn-small btn-secondary">@L["Search"]</button>
 </form>
 
 <div class="thumb-grid">
@@ -14,9 +34,14 @@
         <div class="thumb">
             @if (f.IsImage) { <a href="@f.Url" target="_blank"><img src="@f.Url" alt="" loading="lazy" /></a> }
             else if (f.IsVideo) { <video src="@f.Url#t=0.1" controls preload="metadata" playsinline></video> }
-            else { <a href="@f.Url" target="_blank"><div class="file-icon">PDF</div></a> }
+            else { <a href="@f.Url" target="_blank"><div class="file-icon file-@f.Kind">@f.Ext</div></a> }
+            <div class="file-name" title="@f.Name">@f.Name</div>
             <input type="text" readonly value="@f.Url" onclick="this.select()" aria-label="@L["File URL"]" />
             <div class="muted">@(f.Size >= 1024 * 1024 ? (f.Size / 1048576.0).ToString("0.#") + " MB" : (f.Size / 1024.0).ToString("0.#") + " KB") · @f.Modified.ToString("yyyy-MM-dd")</div>
+            <div class="row-actions" style="margin-top:.4rem">
+                <button type="button" class="btn btn-small btn-secondary" data-copy="@f.Url" data-copied="@L["Copied!"]">@L["Copy link"]</button>
+                <a class="btn btn-small btn-secondary" href="@f.Url" download="@f.Name">@L["Download"]</a>
+            </div>
             @if (User.IsAdministrator())
             {
                 <form asp-action="Delete" method="post" data-confirm="@L["Delete this file? Posts that use it will show a broken link."]">
